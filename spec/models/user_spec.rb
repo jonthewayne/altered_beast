@@ -10,32 +10,13 @@ describe User do
     end.should change(User, :count).by(1)
   end
 
-  it 'requires login' do
-    lambda do
-      u = create_user(:login => nil)
-      u.errors.on(:login).should_not be_nil
-    end.should_not change(User, :count)
-  end
-
-  it 'requires password' do
-    lambda do
-      u = create_user(:password => nil)
-      u.errors.on(:password).should_not be_nil
-    end.should_not change(User, :count)
-  end
-
-  it 'requires password confirmation' do
-    lambda do
-      u = create_user(:password_confirmation => nil)
-      u.errors.on(:password_confirmation).should_not be_nil
-    end.should_not change(User, :count)
-  end
-
-  it 'requires email' do
-    lambda do
-      u = create_user(:email => nil)
-      u.errors.on(:email).should_not be_nil
-    end.should_not change(User, :count)
+  [:login, :password, :password_confirmation, :email, :site_id].each do |attr|
+    it "requires #{attr}" do
+      lambda do
+        u = create_user attr => nil
+        u.errors.on(attr).should_not be_nil
+      end.should_not change(User, :count)
+    end
   end
 
   it 'resets password' do
@@ -91,14 +72,6 @@ describe User do
     users(:default).remember_token_expires_at.between?(before, after).should be_true
   end
 
-  it 'registers passive user' do
-    user = create_user(:password => nil, :password_confirmation => nil)
-    user.should be_passive
-    user.update_attributes(:password => 'new password', :password_confirmation => 'new password')
-    user.register!
-    user.should be_pending
-  end
-
   it 'suspends user' do
     users(:default).suspend!
     users(:default).should be_suspended
@@ -110,10 +83,8 @@ describe User do
   end
 
   it 'unsuspends user' do
-    users(:default).suspend!
-    users(:default).should be_suspended
-    users(:default).unsuspend!
-    users(:default).should be_active
+    users(:suspended).unsuspend!
+    users(:suspended).should be_active
   end
 
   it 'deletes user' do
@@ -125,6 +96,22 @@ describe User do
 
 protected
   def create_user(options = {})
-    User.create({ :login => 'quire', :email => 'quire@example.com', :password => 'quire', :password_confirmation => 'quire' }.merge(options))
+    returning User.new({ :login => 'quire', :email => 'quire@example.com', :password => 'quire', :password_confirmation => 'quire' }.merge(options)) do |u|
+      u.site_id = options.key?(:site_id) ? options[:site_id] : 1
+      u.save
+    end
+  end
+end
+
+describe User, "with no created users" do
+  define_models :copy => false do
+    model User
+  end
+  
+  it 'creates initial user as an admin' do
+    user = User.new :login => 'quire', :email => 'quire@example.com', :password => 'quire', :password_confirmation => 'quire'
+    user.site_id = 1
+    user.save!
+    user.should be_admin
   end
 end

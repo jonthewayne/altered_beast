@@ -1,7 +1,4 @@
 class UsersController < ApplicationController
-  # Be sure to include AuthenticationSystem in Application Controller instead
-  include AuthenticatedSystem
-  
   # Protect these actions behind an admin login
   # before_filter :admin_required, :only => [:suspend, :unsuspend, :destroy, :purge]
   before_filter :find_user, :only => [:suspend, :unsuspend, :destroy, :purge]
@@ -17,7 +14,7 @@ class UsersController < ApplicationController
     # request forgery protection.
     # uncomment at your own risk
     # reset_session
-    @user = User.new(params[:user])
+    @user = current_site.users.build(params[:user])
     raise ActiveRecord::RecordInvalid.new(@user) unless @user.valid?
     @user.register!
     self.current_user = @user
@@ -28,7 +25,7 @@ class UsersController < ApplicationController
   end
 
   def activate
-    self.current_user = params[:activation_code].blank? ? :false : User.find_in_state(:first, :pending, :conditions => {:activation_code => params[:activation_code]})
+    self.current_user = params[:activation_code].blank? ? :false : current_site.all_users.find_in_state(:first, :pending, :conditions => {:activation_code => params[:activation_code]})
     if logged_in?
       current_user.activate!
       flash[:notice] = "Signup complete!"
@@ -58,7 +55,7 @@ class UsersController < ApplicationController
 
 protected
   def find_user
-    @user = User.find(params[:id])
+    @user = current_site.users.find(params[:id])
   end
 
 end

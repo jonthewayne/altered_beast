@@ -11,6 +11,13 @@
 
 ActiveRecord::Schema.define() do
 
+  create_table "sites", :force => true do |t|
+    t.string   "name"
+    t.string   "host"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
   create_table "users", :force => true do |t|
     t.string   "login"
     t.string   "email"
@@ -24,7 +31,8 @@ ActiveRecord::Schema.define() do
     t.datetime "activated_at"
     t.string   "state",                                   :default => "passive"
     t.datetime "deleted_at"
-    t.boolean :admin, :default => false
+    t.boolean  "admin",                                   :default => false
+    t.integer  "site_id"
   end
 
 end

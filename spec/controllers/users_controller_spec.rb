@@ -42,23 +42,22 @@ describe UsersController do
     end.should_not change(User, :count)
   end
   
-  
   it 'activates user' do
-    User.authenticate(users(:pending).login, 'test').should be_nil
+    sites(:default).users.authenticate(users(:pending).login, 'test').should be_nil
     get :activate, :activation_code => users(:pending).activation_code
     response.should redirect_to('/')
+    sites(:default).users.authenticate(users(:pending).login, 'test').should == users(:pending)
     flash[:notice].should_not be_nil
-    User.authenticate(users(:pending).login, 'test').should == users(:pending)
   end
   
   it 'does not activate user without key' do
-      get :activate
-      flash[:notice].should be_nil
+    get :activate
+    flash[:notice].should be_nil
   end
   
   it 'does not activate user with blank key' do
-      get :activate, :activation_code => ''
-      flash[:notice].should be_nil
+    get :activate, :activation_code => ''
+    flash[:notice].should be_nil
   end
   
   def create_user(options = {})

@@ -20,8 +20,10 @@ module User::Validation
       validates_confirmation_of :password,                   :if => :password_required?
       validates_length_of       :login,    :within => 3..40
       validates_length_of       :email,    :within => 3..100
-      validates_uniqueness_of   :login, :email, :case_sensitive => false
+      validates_uniqueness_of   :login, :email, :scope => :site_id
+      before_save :downcase_email_and_login
       before_save :encrypt_password
+      before_create :set_first_user_as_admin
   
       # prevents a user from submitting a crafted form that bypasses activation
       # anything else you want your user to change should be added here.
@@ -48,5 +50,14 @@ protected
     
   def password_required?
     crypted_password.blank? || !password.blank?
+  end
+  
+  def set_first_user_as_admin
+    self.admin = true if User.count.zero?
+  end
+  
+  def downcase_email_and_login
+    login.downcase!
+    email.downcase!
   end
 end

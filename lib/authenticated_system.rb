@@ -1,5 +1,9 @@
 module AuthenticatedSystem
   protected
+    def current_site
+      @current_site ||= Site.find_by_host(request.host)
+    end
+    
     # Returns true or false if the user is logged in.
     # Preloads @current_user with the user model if they're logged in.
     def logged_in?
@@ -18,6 +22,10 @@ module AuthenticatedSystem
       @current_user = new_user
     end
     
+    def admin?
+      logged_in? && current_user.admin?
+    end
+    
     # Check if the user is authorized
     #
     # Override this method in your controllers if you want to restrict access
@@ -31,7 +39,7 @@ module AuthenticatedSystem
     #    current_user.login != "bob"
     #  end
     def authorized?
-      logged_in?
+      true
     end
 
     # Filter method to enforce a login requirement.
@@ -49,7 +57,11 @@ module AuthenticatedSystem
     #   skip_before_filter :login_required
     #
     def login_required
-      authorized? || access_denied
+      (logged_in? && authorized?) || access_denied
+    end
+    
+    def admin_required
+      (admin? && authorized?) || access_denied
     end
 
     # Redirect as appropriate when an access request fails.
@@ -92,23 +104,23 @@ module AuthenticatedSystem
     # Inclusion hook to make #current_user and #logged_in?
     # available as ActionView helper methods.
     def self.included(base)
-      base.send :helper_method, :current_user, :logged_in?
+      base.send :helper_method, :current_user, :logged_in?, :current_site
     end
 
     # Called from #current_user.  First attempt to login by the user id stored in the session.
     def login_from_session
-      self.current_user = User.find_by_id(session[:user]) if session[:user]
+      self.current_user = current_site.users.find_by_id(session[:user]) if session[:user]
     end
 
     # Called from #current_user.  Now, attempt to login by basic authentication information.
     def login_from_basic_auth
       username, passwd = get_auth_data
-      self.current_user = User.authenticate(username, passwd) if username && passwd
+      self.current_user = current_site.users.authenticate(username, passwd) if username && passwd
     end
 
     # Called from #current_user.  Finaly, attempt to login by an expiring token in the cookie.
     def login_from_cookie
-      user = cookies[:auth_token] && User.find_by_remember_token(cookies[:auth_token])
+      user = cookies[:auth_token] && current_site.users.find_by_remember_token(cookies[:auth_token])
       if user && user.remember_token?
         user.remember_me
         cookies[:auth_token] = { :value => user.remember_token, :expires => user.remember_token_expires_at }
