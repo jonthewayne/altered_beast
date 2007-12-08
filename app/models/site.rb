@@ -10,6 +10,11 @@ class Site < ActiveRecord::Base
     return nil if name.nil?
     name.strip!
     name.sub! /^www\./, ''
-    find(:first, :conditions => {:host => name}) || main
+    sites = find :all, :conditions => ['host = ? or host = ?', name, '']
+    sites.reject { |s| s.default? }.first || sites.first
+  end
+  
+  def default?
+    host.blank?
   end
 end

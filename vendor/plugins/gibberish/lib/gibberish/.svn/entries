@@ -1,0 +1,52 @@
+8
+
+dir
+3065
+http://svn.techno-weenie.net/projects/beast/trunk/vendor/plugins/gibberish/lib/gibberish
+http://svn.techno-weenie.net/projects
+
+
+
+2007-05-08T05:32:52.556656Z
+2859
+technoweenie
+
+
+svn:special svn:externals svn:needs-lock
+
+
+
+
+
+
+
+
+
+
+
+567b1171-46fb-0310-a4c9-b4bef9110e78
+
+localize.rb
+file
+
+
+
+
+2007-02-15T12:40:07.000000Z
+f4bea4d22d5f79c36e957e7d57feece3
+2007-05-08T01:18:39.817419Z
+2858
+technoweenie
+
+string_ext.rb
+file
+
+
+
+
+2007-05-08T01:30:52.000000Z
+4395c4e17ec5f11af3bd079dccb6453b
+2007-05-08T05:32:52.556656Z
+2859
+technoweenie
+

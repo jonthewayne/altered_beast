@@ -1,0 +1,23 @@
+K 25
+svn:wc:ra_dav:version-url
+V 60
+/projects/!svn/ver/2859/beast/trunk/vendor/plugins/gibberish
+END
+LICENSE
+K 25
+svn:wc:ra_dav:version-url
+V 68
+/projects/!svn/ver/2858/beast/trunk/vendor/plugins/gibberish/LICENSE
+END
+init.rb
+K 25
+svn:wc:ra_dav:version-url
+V 68
+/projects/!svn/ver/2858/beast/trunk/vendor/plugins/gibberish/init.rb
+END
+README
+K 25
+svn:wc:ra_dav:version-url
+V 67
+/projects/!svn/ver/2858/beast/trunk/vendor/plugins/gibberish/README
+END

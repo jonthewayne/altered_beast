@@ -1,0 +1,43 @@
+<%= render :partial => "layouts/head" %>
+
+<div id="container">
+
+<div id="content">
+  
+<%= content_tag 'p', h(flash[:notice]), :class => 'notice' if flash[:notice] %>
+<%= content_tag 'p', h(flash[:error]), :class => 'notice error' if flash[:error] %>
+  
+<%= yield %>
+</div>
+
+<div id="right">
+  <%= yield :right %>
+</div>
+
+<br style="clear:both;" />
+
+</div>
+
+<div id="footer">
+<!--
+<p class="legal">
+<a href="/legal/" style="color:#369;">Legal</a>
+</p>
+-->
+<p class="disclaim">
+<strong>
+  <%
+  footers=["Two's company. Three's a forum. More's a Beast."[:footer_message]
+  ]
+  %>
+  <%= footers[rand(footers.size)]%>
+  </strong>
+</p>
+<p class="credit">
+  <%= 'Powered by'[:powered_by] %> <a href="http://beast.caboo.se/">Beast</a><br />
+  &copy; 2006 <a href="http://www.workingwithrails.com/person/5337-josh-goebel" class="subtle">Josh Goebel</a> <%= 'and'[:and] %> <a href="http://weblog.techno-weenie.net" class="subtle">Rick Olson</a>
+</p>
+<br style="clear:both;" />
+</div>
+</body>
+</html>

@@ -1,0 +1,34 @@
+<% content_for :right do %>
+
+<h5><%= 'What is Beast?'[:beast_sidebar_title] %></h5>
+
+<p>
+  <%= 'A small, light-weight forum in Rails with a scary name and a goal of around 500 lines of code when we\'re done.'[:beast_sidebar_body] %>
+</p>
+
+<% if admin? %>
+<h6><%= 'Admin'[:admin_title] %></h6>
+<p><%= link_to 'Create New Site'[:create_new_site], new_site_path, :class => "utility" %></p>
+<% end %>
+
+<% end %>
+
+<h1 style="margin-top:0;"><%= 'Site'[:sites_title] %></h1>
+
+<table border="0" cellspacing="0" cellpadding="0" class="wide forums">
+  <tr>
+    <th class="la" width="90%"><%= 'Site'[:forum_title] %></th>
+    <th class="la" width="10%">&nbsp;</th>
+  </tr>
+<% @sites.each do |site| -%>  
+  <tr>
+    <td class="c1 vat">
+      <%= link_to h(site.name), (site.default? ? root_path : root_url(:host => site.host)), :class => "title" %>
+    </td>
+    <td class="c2">
+      <%= link_to 'Edit'[:edit_title], edit_site_path(site), :class => "tiny", :rel => "directory" if admin? %>
+    </td>
+  </tr>
+<% end %>
+</table>
+

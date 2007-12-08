@@ -1,4 +1,6 @@
 ActionController::Routing::Routes.draw do |map|
+  map.resources :sites
+
   map.root :controller => 'forums', :action => 'index'
   map.resources :users, :member => { :suspend   => :put,
                                      :unsuspend => :put,

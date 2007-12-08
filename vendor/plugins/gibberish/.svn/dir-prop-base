@@ -1,0 +1,17 @@
+K 21
+piston:local-revision
+V 4
+2857
+K 22
+piston:remote-revision
+V 3
+192
+K 11
+piston:root
+V 42
+svn://errtheblog.com/svn/plugins/gibberish
+K 11
+piston:uuid
+V 36
+1eaa51fe-a21a-0410-9c2e-ae7a00a434c4
+END

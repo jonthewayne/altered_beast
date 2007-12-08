@@ -1,0 +1,12 @@
+<div class="crumbs">
+  <%= link_to 'Sites'[:sites_title], sites_path %> <span class="arrow">&rarr;</span>
+</div>
+
+<h1><%= 'Edit Site'[:edit_site] %></h1>
+
+<% form_for :site,
+     :url  => site_path(@site),
+     :html => { :method => :put } do |f| -%>
+<%= render :partial => "form", :object => f %>
+<%= submit_tag 'Save Forum'[:save_site], :or => link_to('Cancel'[:cancel], sites_path) %>
+<% end -%>
