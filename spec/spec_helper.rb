@@ -6,6 +6,8 @@ require 'spec'
 require 'spec/rails'
 require 'model_stubbing'
 require File.dirname(__FILE__) + "/model_stubs"
+require 'ruby-debug'
+Debugger.start
 
 Spec::Runner.configure do |config|
   config.use_transactional_fixtures = true

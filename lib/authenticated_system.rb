@@ -107,7 +107,7 @@ module AuthenticatedSystem
     end
 
     # Called from #current_user.  Finaly, attempt to login by an expiring token in the cookie.
-    def login_from_cookie      
+    def login_from_cookie
       user = cookies[:auth_token] && User.find_by_remember_token(cookies[:auth_token])
       if user && user.remember_token?
         user.remember_me

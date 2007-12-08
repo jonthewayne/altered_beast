@@ -28,8 +28,8 @@ class UsersController < ApplicationController
   end
 
   def activate
-    self.current_user = params[:activation_code].blank? ? :false : User.find_by_activation_code(params[:activation_code])
-    if logged_in? && !current_user.active?
+    self.current_user = params[:activation_code].blank? ? :false : User.find_in_state(:first, :pending, :conditions => {:activation_code => params[:activation_code]})
+    if logged_in?
       current_user.activate!
       flash[:notice] = "Signup complete!"
     end
@@ -38,22 +38,22 @@ class UsersController < ApplicationController
 
   def suspend
     @user.suspend! 
-    redirect_to users_url
+    redirect_to users_path
   end
 
   def unsuspend
     @user.unsuspend! 
-    redirect_to users_url
+    redirect_to users_path
   end
 
   def destroy
     @user.delete!
-    redirect_to users_url
+    redirect_to users_path
   end
 
   def purge
     @user.destroy
-    redirect_to users_url
+    redirect_to users_path
   end
 
 protected

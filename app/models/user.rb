@@ -76,11 +76,11 @@ class User < ActiveRecord::Base
   end
 
   def remember_me_for(time)
-    remember_me_until time.from_now.utc
+    remember_me_until time.from_now
   end
 
   def remember_me_until(time)
-    self.remember_token_expires_at = time
+    self.remember_token_expires_at = time.utc
     self.remember_token            = encrypt("#{email}--#{remember_token_expires_at}")
     save(false)
   end

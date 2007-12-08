@@ -1,7 +1,7 @@
 require File.dirname(__FILE__) + '/../spec_helper'
 
 describe UsersController do
-  fixtures :users
+  define_models
 
   it 'allows signup' do
     lambda do
@@ -44,11 +44,11 @@ describe UsersController do
   
   
   it 'activates user' do
-    User.authenticate('aaron', 'test').should be_nil
-    get :activate, :activation_code => users(:aaron).activation_code
+    User.authenticate(users(:pending).login, 'test').should be_nil
+    get :activate, :activation_code => users(:pending).activation_code
     response.should redirect_to('/')
     flash[:notice].should_not be_nil
-    User.authenticate('aaron', 'test').should == users(:aaron)
+    User.authenticate(users(:pending).login, 'test').should == users(:pending)
   end
   
   it 'does not activate user without key' do
