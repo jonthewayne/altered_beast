@@ -24,6 +24,7 @@ ActiveRecord::Schema.define() do
     t.datetime "activated_at"
     t.string   "state",                                   :default => "passive"
     t.datetime "deleted_at"
+    t.boolean :admin, :default => false
   end
 
 end
