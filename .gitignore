@@ -1,7 +1,7 @@
 tmp
 log
 config/database.yml
-config/*.sqlite
-config/*.sqlite2
-config/*.sqlite3
-config/*.db
+db/*.sqlite
+db/*.sqlite2
+db/*.sqlite3
+db/*.db
