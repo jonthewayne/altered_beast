@@ -11,6 +11,17 @@
 
 ActiveRecord::Schema.define() do
 
+  create_table "forums", :force => true do |t|
+    t.integer "site_id"
+    t.string  "name"
+    t.string  "description"
+    t.integer "topics_count",     :default => 0
+    t.integer "posts_count",      :default => 0
+    t.integer "position",         :default => 0
+    t.text    "description_html"
+    t.string  "state",            :default => "public"
+  end
+
   create_table "sites", :force => true do |t|
     t.string   "name"
     t.string   "host"

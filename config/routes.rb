@@ -1,7 +1,7 @@
 ActionController::Routing::Routes.draw do |map|
   map.resources :sites
 
-  map.root :controller => 'forums', :action => 'index'
+  map.resources :forums
   map.resources :users, :member => { :suspend   => :put,
                                      :unsuspend => :put,
                                      :purge     => :delete }
@@ -10,5 +10,6 @@ ActionController::Routing::Routes.draw do |map|
   map.login    '/login',                     :controller => 'sessions', :action => 'new'
   map.logout   '/logout',                    :controller => 'sessions', :action => 'destroy'
   map.resource  :session
-
+  map.resources :sites
+  map.root :controller => 'forums', :action => 'index'
 end

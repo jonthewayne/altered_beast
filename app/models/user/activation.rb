@@ -1,6 +1,6 @@
 module User::Activation
   def remember_token?
-    remember_token_expires_at && Time.now.utc < remember_token_expires_at 
+    active? && remember_token_expires_at && Time.now.utc < remember_token_expires_at 
   end
 
   # These create and unset the fields required for remembering users between browser closes
