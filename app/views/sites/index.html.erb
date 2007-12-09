@@ -13,7 +13,7 @@
 
 <% end %>
 
-<h1 style="margin-top:0;"><%= 'Site'[:sites_title] %></h1>
+<h1 style="margin-top:0;"><%= 'Sites'[:sites_title] %></h1>
 
 <table border="0" cellspacing="0" cellpadding="0" class="wide forums">
   <tr>
@@ -24,6 +24,7 @@
   <tr>
     <td class="c1 vat">
       <%= link_to h(site.name), (site.default? ? root_path : root_url(:host => site.host)), :class => "title" %>
+			<%= content_tag(:small, "(#{h(site.host)})") unless site.default? -%>
     </td>
     <td class="c2">
       <%= link_to 'Edit'[:edit_title], edit_site_path(site), :class => "tiny", :rel => "directory" if admin? %>

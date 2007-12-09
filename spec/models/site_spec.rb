@@ -1,5 +1,49 @@
 require File.dirname(__FILE__) + '/../spec_helper'
 
+describe Site do
+  define_models do
+    model Site do
+      stub :other, :name => 'other', :host => 'other.test.host'
+    end
+  end
+  
+  it "requires name" do
+    site = new_site(:default, :name => nil, :host => 'foo.bar')
+    site.should_not be_valid
+    site.errors.on(:name).should_not be_nil
+  end
+  
+  it "allows blank host" do
+    Site.delete_all
+    site = new_site(:default, :host => '', :name => 'foo.bar')
+    site.should be_valid
+  end
+  
+  it "validates uniqueness of host" do
+    site = new_site(:default, :host => sites(:other).host, :name => 'foo.bar')
+    site.should_not be_valid
+    site.errors.on(:host).should_not be_nil
+  end
+  
+  it "validates uniqueness of blank host" do
+    site = new_site(:default, :host => '', :name => 'foo.bar')
+    site.should_not be_valid
+    site.errors.on(:host).should_not be_nil
+  end
+  
+  it "downcases set host" do
+    s = Site.new
+    s.host = 'A'
+    s.host.should == 'a'
+  end
+  
+  it "accepts nil host value" do
+    s = Site.new
+    s.host = nil
+    s.host.should == ''
+  end
+end
+
 describe Site, "#find_by_host" do
   define_models do
     model Site do
@@ -13,6 +57,10 @@ describe Site, "#find_by_host" do
   
   it "strips host name" do
     Site.find_by_host("    " + sites(:other).host + "  ").should == sites(:other)
+  end
+  
+  it "downcases host name" do
+    Site.find_by_host("    " + sites(:other).host.upcase + "  ").should == sites(:other)
   end
   
   it "ignores 'www.' prefix" do
