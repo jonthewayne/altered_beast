@@ -1,0 +1,17 @@
+K 21
+piston:local-revision
+V 4
+2984
+K 22
+piston:remote-revision
+V 4
+7736
+K 11
+piston:root
+V 53
+http://svn.rubyonrails.org/rails/plugins/acts_as_list
+K 11
+piston:uuid
+V 36
+5ecf4fe2-1ee6-0310-87b1-e25e094e27de
+END

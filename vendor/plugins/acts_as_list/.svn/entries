@@ -1,0 +1,46 @@
+8
+
+dir
+3065
+http://svn.techno-weenie.net/projects/beast/trunk/vendor/plugins/acts_as_list
+http://svn.techno-weenie.net/projects
+
+
+
+2007-10-04T03:53:52.310474Z
+2985
+technoweenie
+has-props
+
+svn:special svn:externals svn:needs-lock
+
+test
+dir
+
+init.rb
+file
+
+
+
+
+2007-09-11T05:40:02.000000Z
+a835ba701061ffbc6de94d018dcbe146
+2007-10-04T03:53:52.310474Z
+2985
+technoweenie
+
+lib
+dir
+
+README
+file
+
+
+
+
+2007-09-10T04:23:59.000000Z
+42212b5cb681c9888d56f9c0f36e1e02
+2007-10-04T03:53:52.310474Z
+2985
+technoweenie
+
