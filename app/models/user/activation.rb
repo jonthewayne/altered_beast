@@ -1,4 +1,4 @@
-module User::Activation
+class User
   def remember_token?
     active? && remember_token_expires_at && Time.now.utc < remember_token_expires_at 
   end

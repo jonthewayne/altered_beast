@@ -1,44 +1,37 @@
-module User::States
-  module ClassMethods
-    # Authenticates a user by their login name and unencrypted password.  Returns the user or nil.
-    def authenticate(login, password)
-      u = find_in_state :first, :active, :conditions => {:login => login} # need to get the salt
-      u && u.authenticated?(password) ? u : nil
-    end
+class User
+  acts_as_state_machine :initial => :pending
+  state :passive
+  state :pending, :enter => :make_activation_code
+  state :active,  :enter => :do_activate
+  state :suspended
+  state :deleted, :enter => :do_delete
+  
+  event :register do
+    transitions :from => :passive, :to => :pending, :guard => Proc.new {|u| !(u.crypted_password.blank? && u.password.blank?) }
   end
-
-  def self.included(base)
-    base.extend ClassMethods
-    base.class_eval do
-      acts_as_state_machine :initial => :pending
-      state :passive
-      state :pending, :enter => :make_activation_code
-      state :active,  :enter => :do_activate
-      state :suspended
-      state :deleted, :enter => :do_delete
+  
+  event :activate do
+    transitions :from => :pending, :to => :active 
+  end
+  
+  event :suspend do
+    transitions :from => [:passive, :pending, :active], :to => :suspended
+  end
+  
+  event :delete do
+    transitions :from => [:passive, :pending, :active, :suspended], :to => :deleted
+  end
+  
+  event :unsuspend do
+    transitions :from => :suspended, :to => :active,  :guard => Proc.new {|u| !u.activated_at.blank? }
+    transitions :from => :suspended, :to => :pending, :guard => Proc.new {|u| !u.activation_code.blank? }
+    transitions :from => :suspended, :to => :passive
+  end
       
-      event :register do
-        transitions :from => :passive, :to => :pending, :guard => Proc.new {|u| !(u.crypted_password.blank? && u.password.blank?) }
-      end
-      
-      event :activate do
-        transitions :from => :pending, :to => :active 
-      end
-      
-      event :suspend do
-        transitions :from => [:passive, :pending, :active], :to => :suspended
-      end
-      
-      event :delete do
-        transitions :from => [:passive, :pending, :active, :suspended], :to => :deleted
-      end
-      
-      event :unsuspend do
-        transitions :from => :suspended, :to => :active,  :guard => Proc.new {|u| !u.activated_at.blank? }
-        transitions :from => :suspended, :to => :pending, :guard => Proc.new {|u| !u.activation_code.blank? }
-        transitions :from => :suspended, :to => :passive
-      end
-    end
+  # Authenticates a user by their login name and unencrypted password.  Returns the user or nil.
+  def self.authenticate(login, password)
+    u = find_in_state :first, :active, :conditions => {:login => login} # need to get the salt
+    u && u.authenticated?(password) ? u : nil
   end
 
   def make_activation_code
