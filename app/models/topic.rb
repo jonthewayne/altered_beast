@@ -15,7 +15,7 @@ class Topic < ActiveRecord::Base
   belongs_to :forum, :counter_cache => true
 
   has_many :posts,       :order => "#{Post.table_name}.created_at", :dependent => :delete_all
-  has_one  :recent_post, :order => "#{Post.table_name}.created_at", :class_name => "Post"
+  has_one  :recent_post, :order => "#{Post.table_name}.created_at DESC", :class_name => "Post"
   
   has_many :voices, :through => :posts, :source => :user, :uniq => true
   
@@ -35,12 +35,11 @@ class Topic < ActiveRecord::Base
   def self.post!(attributes, user)
     attributes.symbolize_keys!
     returning Topic.new(attributes) do |topic|
-      debugger if topic.body.blank?
       if user.admin? || user.moderator_of?(topic.forum)
         topic.sticky, topic.locked = attributes[:sticky], attributes[:locked]
       end
       topic.user = user
-      topic.save! rescue ActiveRecord::RecordInvalid
+      topic.save
     end
   end
   
@@ -48,7 +47,7 @@ class Topic < ActiveRecord::Base
     returning posts.build(:body => body) do |post|
       post.forum = forum
       post.user  = user
-      post.save! rescue ActiveRecord::RecordInvalid
+      post.save
     end
   end
 
@@ -99,7 +98,7 @@ protected
     return unless @old_forum_id
     posts.update_all :forum_id => forum_id
     Forum.update_all "posts_count = posts_count - #{posts_count}", ['id = ?', @old_forum_id]
-    Forum.update_all "posts_count = posts_count + #{posts_count}, topics_count = topics_count + 1", ['id = ?', forum_id]
+    Forum.update_all "posts_count = posts_count + #{posts_count}", ['id = ?', forum_id]
   end
   
   def count_user_posts_for_counter_cache

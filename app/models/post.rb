@@ -15,6 +15,10 @@ class Post < ActiveRecord::Base
 
   attr_accessible :body
 
+  def editable_by?(user)
+    user && (user.id == user_id || user.admin? || user.moderator_of?(forum_id))
+  end
+
 protected
   # using count isn't ideal but it gives us correct caches each time
   def update_cached_fields

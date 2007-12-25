@@ -26,6 +26,10 @@ describe Topic do
       t.errors.on(attr).should_not be_nil
     end
   end
+  
+  it "selects posts" do
+    topics(:default).posts.should == [posts(:default)]
+  end
 
   it "creates unsticky topic by default" do
     t = new_topic(:default)
@@ -91,23 +95,23 @@ module TopicCreatePostHelper
       @topic.reload.last_user.should == @topic.posts.first.user
     end
 
-    base.it "decrements Topic.count" do
+    base.it "increments Topic.count" do
       @creating_topic.should change { Topic.count }.by(1)
     end
     
-    base.it "decrements Post.count" do
+    base.it "increments Post.count" do
       @creating_topic.should change { Post.count }.by(1)
     end
     
-    base.it "decrements cached forum topics_count" do
+    base.it "increments cached forum topics_count" do
       @creating_topic.should change { forums(:default).reload.topics.size }.by(1)
     end
     
-    base.it "decrements cached forum posts_count" do
+    base.it "increments cached forum posts_count" do
       @creating_topic.should change { forums(:default).reload.posts.size }.by(1)
     end
     
-    base.it "decrements cached user posts_count" do
+    base.it "increments cached user posts_count" do
       @creating_topic.should change { users(:default).reload.posts.size }.by(1)
     end
   end
@@ -175,10 +179,57 @@ describe Topic, ".post! for admins" do
   end
 end
 
+describe Topic, "#post!" do
+  define_models
+  
+  before do
+    @user  = users(:default)
+    @topic = topics(:default)
+    @creating_post = lambda { post! }
+  end
+  
+  it "doesn't post if topic is locked" do
+    @topic.locked = true; @topic.save
+    @post = post!
+    @post.should be_new_record
+  end
+
+  it "sets topic's last_updated_at" do
+    @post = post!
+    @topic.reload.last_updated_at.should == @post.created_at
+  end
+
+  it "sets topic's last_user_id" do
+    Topic.update_all 'last_user_id = 3'
+    @post = post!
+    @topic.reload.last_user.should == @post.user
+  end
+  
+  it "increments Post.count" do
+    @creating_post.should change { Post.count }.by(1)
+  end
+  
+  it "increments cached topic posts_count" do
+    @creating_post.should change { topics(:default).reload.posts.size }.by(1)
+  end
+  
+  it "increments cached forum posts_count" do
+    @creating_post.should change { forums(:default).reload.posts.size }.by(1)
+  end
+  
+  it "increments cached user posts_count" do
+    @creating_post.should change { users(:default).reload.posts.size }.by(1)
+  end
+
+  def post!
+    topics(:default).post!('duane, i think you might be color blind.', @user)
+  end
+end
+
 describe Topic, "being deleted" do
   define_models
 
-  before :all do
+  before do
     @topic = topics(:default)
     @deleting_topic = lambda { @topic.destroy }
   end
@@ -213,7 +264,7 @@ end
 describe Topic, "being moved to another forum" do
   define_models
   
-  before :all do
+  before do
     @forum     = forums(:default)
     @new_forum = forums(:other)
     @topic     = topics(:default)
