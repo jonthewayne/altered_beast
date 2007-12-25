@@ -29,4 +29,7 @@ ModelStubbing.define_models do
     stub :other, :topic => all_stubs(:other_topic), :body => 'other', :created_at => current_time - 13.days
     stub :other_forum, :forum => all_stubs(:other_forum), :topic => all_stubs(:other_forum_topic)
   end
+  
+  model Moderatorship
+  model Monitorship
 end
