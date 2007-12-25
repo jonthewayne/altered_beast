@@ -9,7 +9,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define() do
+ActiveRecord::Schema.define(:version => 1) do
 
   create_table "forums", :force => true do |t|
     t.integer "site_id"
@@ -21,8 +21,13 @@ ActiveRecord::Schema.define() do
     t.text    "description_html"
     t.string  "state",            :default => "public"
   end
-  
-  add_index "forums", ["position", "site_id"], :name => "index_forums_by_position"
+
+  create_table "moderatorships", :force => true do |t|
+    t.integer  "forum_id"
+    t.integer  "user_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
 
   create_table "posts", :force => true do |t|
     t.integer  "user_id"

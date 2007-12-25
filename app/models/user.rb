@@ -7,8 +7,11 @@ class User < ActiveRecord::Base
   has_many :posts
   has_many :topics
   
+  has_many :moderatorships
+  has_many :moderated_forums, :through => :moderatorships, :source => :forum
+  
   def moderator_of?(forum)
-    admin?
+    Moderatorship.exists?(:user_id => id, :forum_id => forum.id)
   end
   
   attr_readonly :posts_count
