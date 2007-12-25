@@ -17,7 +17,7 @@ class Forum < ActiveRecord::Base
   has_many :posts,       :order => "#{Post.table_name}.created_at DESC", :dependent => :delete_all
   has_one  :recent_post, :order => "#{Post.table_name}.created_at DESC", :class_name => 'Post'
 
-  has_many :moderatorships
+  has_many :moderatorships, :dependent => :delete_all
   has_many :moderators, :through => :moderatorships, :source => :user
 
   # retrieves forums ordered by position

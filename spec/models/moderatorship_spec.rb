@@ -29,6 +29,15 @@ describe Moderatorship do
       forums(:default).moderators << users(:default)
     end.should raise_error(ActiveRecord::RecordInvalid)
   end
+  
+  %w(forum user).each do |model|
+    it "is cleaned up after a #{model} is deleted" do
+      send(model.pluralize, :default).destroy
+      lambda do
+        moderatorships(:default).reload
+      end.should raise_error(ActiveRecord::RecordNotFound)
+    end
+  end
 end
 
 ModelStubbing.define_models :moderators do
