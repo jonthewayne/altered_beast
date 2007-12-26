@@ -210,9 +210,7 @@ protected
         pieces = string.to_s.split(".")
         string = pieces.shift
         record = instance_variable_get("@#{string}")
-        until pieces.empty?
-          record = record.send(pieces.shift)
-        end
+        record = record.send(pieces.shift) until pieces.empty?
         acting.should have_text(string_proc.call(record))
       else
         acting.should have_text(string)
