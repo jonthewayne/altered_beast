@@ -60,13 +60,13 @@ class Spec::Example::AwesomeExample < Spec::Example::Example
   def assigns(*names)
     names.each do |name|
       if name.is_a?(Symbol)
-        assigns name => name
+        assigns name => name # go forth and recurse!
       elsif name.is_a?(Hash)
         name.each do |key, value|
-          send("assigns_#{key}", value) and next if @@variable_types.key?(key)
           desc, imp = assigns_example_values(key, value)
-          create_sub_example(desc, &imp) and next if @defined_description
-          @defined_description, @implementation = desc, imp
+          if @@variable_types.key?(key) then send("assigns_#{key}", value)
+          elsif @defined_description then create_sub_example(desc, &imp)
+          else @defined_description, @implementation = desc, imp end
         end
       end
     end
