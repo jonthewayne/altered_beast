@@ -179,7 +179,7 @@ protected
   #
   # Checks that the xml matches a given string
   #
-  #   it.renders :xml, "<foo />"
+  #   it.renders(:xml) { "<foo />" }
   #
   # Checks that the xml matches @foo.to_xml
   #
@@ -187,7 +187,7 @@ protected
   #
   # Checks that the xml matches @foo.errors.to_xml
   #
-  #   it.renders :xml, "foo.errors".intern
+  #   it.renders :xml, "foo.errors"
   #
   #   it.renders :xml, :index, :status => :not_found
   #   it.renders :xml, :index, :format => :xml
@@ -198,23 +198,20 @@ protected
   # If :format is unset, it checks that the action is Mime:HTML.  Otherwise
   # it attempts to match the mime type using Mime::Type.lookup_by_extension.
   #
-  def render_xml(string = nil, options = {}, &string_proc)
-    if string.is_a?(Hash)
-      options = string
-      string  = nil
+  def render_xml(record = nil, options = {}, &block)
+    if record.is_a?(Hash)
+      options = record
+      record  = nil
     end
     @defined_description = "renders xml"
     @implementation = lambda do
-      if string_proc || string.is_a?(Symbol)
-        string_proc ||= lambda { |record| record.to_xml }
-        pieces = string.to_s.split(".")
-        string = pieces.shift
-        record = instance_variable_get("@#{string}")
+      if record
+        pieces = record.to_s.split(".")
+        record = instance_variable_get("@#{pieces.shift}")
         record = record.send(pieces.shift) until pieces.empty?
-        acting.should have_text(string_proc.call(record))
-      else
-        acting.should have_text(string)
       end
+      block ||= lambda { record.to_xml }
+      acting.should have_text block.call
     end
     if @example_group
       assert_status options[:status]
@@ -265,8 +262,8 @@ protected
     end]
   end
 
-  def assert_content_type(type = nil)
-    mime = Mime::Type.lookup_by_extension((type ||= :html).to_s)
+  def assert_content_type(type = :html)
+    mime = Mime::Type.lookup_by_extension((type || :html).to_s)
     create_sub_example "renders with Content-Type of #{mime}" do
       acting.content_type.should == mime
     end

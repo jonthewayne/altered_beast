@@ -176,7 +176,7 @@ describe ForumsController, "POST #create" do
     end
     
     it.assigns :forum
-    it.renders :xml, "forum.errors".intern, :status => :unprocessable_entity
+    it.renders :xml, "forum.errors", :status => :unprocessable_entity
   end
 end
 
@@ -237,7 +237,7 @@ describe ForumsController, "PUT #update" do
     end
     
     it.assigns :forum
-    it.renders :xml, "forum.errors".intern, :status => :unprocessable_entity
+    it.renders :xml, "forum.errors", :status => :unprocessable_entity
   end
 end
 
