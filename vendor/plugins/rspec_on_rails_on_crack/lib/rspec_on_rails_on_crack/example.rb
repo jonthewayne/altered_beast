@@ -123,10 +123,10 @@ class Spec::Example::AwesomeExample < Spec::Example::Example
   def assigns_headers(headers)
     headers.each do |key, value|
       if @defined_description
-        desc, imp = assigns_header_values(key, value)
+        desc, imp = assigns_headers_values(key, value)
         create_sub_example desc, &imp
       else
-        @defined_description, @implementation = assigns_header_values(key, value)
+        @defined_description, @implementation = assigns_headers_values(key, value)
       end
     end
   end
@@ -235,31 +235,27 @@ protected
     end]
   end
   
-  def assigns_header_values(key, value)
-    ["assigns #{key.inspect} header", lambda do
-      acting do |resp|
-        value = instance_eval(&value) if value.respond_to?(:call)
-        assert_collection_value resp.headers, key.to_s, value
-      end
-    end]
-  end
-  
-  def assigns_flash_values(key, value)
-    ["assigns flash[#{key.inspect}]", lambda do
-      acting do |resp|
-        value = instance_eval(&value) if value.respond_to?(:call)
-        assert_collection_value resp.flash, key, value
-      end
-    end]
-  end
-  
-  def assigns_session_values(key, value)
-    ["assigns session[#{key.inspect}]", lambda do
-      acting do |resp|
-        value = instance_eval(&value) if value.respond_to?(:call)
-        assert_collection_value resp.session, key, value
-      end
-    end]
+  {:headers => :to_s, :flash => nil, :session => nil}.each do |collection_type, collection_op|
+    define_method "assigns_#{collection_type}_values" do |key, value|
+      key = key.send(collection_op) if collection_op
+      ["assigns #{collection_type}[#{key.inspect}]", lambda do
+        acting do |resp|
+          collection = resp.send(collection_type)
+          case value
+            when nil
+              collection[key].should be_nil
+            when :not_nil
+              collection[key].should_not be_nil
+            when :undefined
+              collection.should_not include(key)
+            when Proc
+              collection[key].should == instance_eval(&value)
+            else
+              collection[key].should == value
+          end
+        end
+      end]
+    end
   end
 
   def assert_content_type(type = :html)
