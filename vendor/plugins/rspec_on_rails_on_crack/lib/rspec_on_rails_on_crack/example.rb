@@ -239,7 +239,7 @@ protected
         record = record.send(pieces.shift) until pieces.empty?
       end
       block ||= lambda { record.to_xml }
-      acting.should have_text block.call
+      acting.should have_text(block.call)
     end
     assert_status options[:status]
     assert_content_type options[:format] || :xml
