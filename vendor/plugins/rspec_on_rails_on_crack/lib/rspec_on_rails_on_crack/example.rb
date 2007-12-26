@@ -59,25 +59,15 @@ class Spec::Example::AwesomeExample < Spec::Example::Example
   #
   def assigns(*names)
     names.each do |name|
-      case name
-        when Symbol
-          if @defined_description
-            desc, imp = assigns_example_values(name, name)
-            create_sub_example desc, &imp
-          else
-            @defined_description, @implementation = assigns_example_values(name, name)
-          end
-        when Hash
-          name.each do |key, value|
-            if @@variable_types.key?(key.to_sym)
-              send("assigns_#{key}", value)
-            elsif @defined_description
-              desc, imp = assigns_example_values(key, value)
-              create_sub_example desc, &imp
-            else
-              @defined_description, @implementation = assigns_example_values(key, value)
-            end
-          end
+      if name.is_a?(Symbol)
+        assigns name => name
+      elsif name.is_a?(Hash)
+        name.each do |key, value|
+          send("assigns_#{key}", value) and next if @@variable_types.key?(key)
+          desc, imp = assigns_example_values(key, value)
+          create_sub_example(desc, &imp) and next if @defined_description
+          @defined_description, @implementation = desc, imp
+        end
       end
     end
   end
