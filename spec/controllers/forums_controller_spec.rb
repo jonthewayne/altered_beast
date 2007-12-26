@@ -3,6 +3,8 @@ require File.dirname(__FILE__) + '/../spec_helper'
 describe ForumsController, "GET #index" do
   define_models :stubbed
 
+  act! { get :index }
+
   before do
     @site   = sites(:default)
     @forums = [forums(:other), forums(:default)]
@@ -11,62 +13,27 @@ describe ForumsController, "GET #index" do
     @controller.stub!(:admin_required).and_return(true)
     session[:forum_page] = 5
   end
-
-  it "sets @forums" do
-    act!
-    assigns[:forums].should == @forums
-  end
   
-  it "clears session[:forum_page]" do
-    act!
-    session[:forum_page].should be_nil
-  end
+  it.assigns :forums
+  it.renders :template, :index
+  it.assigns_session :forum_page => nil
   
-  it "renders index.html.erb" do
-    act!
-    response.should render_template('index')
-  end
   
-  it "is successful" do
-    act!
-    response.should be_success
-  end
-  
-  it "renders as html" do
-    act!
-    response.content_type.should == Mime::HTML
-  end
-  
-  def act!
-    get :index
-  end  
   
   describe ForumsController, "(xml)" do
     define_models :stubbed
-  
-    it "returns xml" do
-      act!
-      response.should have_text(@forums.to_xml)
-    end
-  
-    it "renders as xml" do
-      act!
-      response.content_type.should == Mime::XML
-    end
+    
+    act! { get :index, :format => 'xml' }
 
-    it "is successful" do
-      act!
-      response.should be_success
-    end
-
-    def act!
-      get :index, :format => 'xml'
-    end
+    it.assigns :forums
+    it.renders :xml, :forums
   end
 end
 
 describe ForumsController, "GET #show" do
   define_models :stubbed
+
+  act! { get :show, :id => 1 }
 
   before do
     @site   = sites(:default)
@@ -78,11 +45,10 @@ describe ForumsController, "GET #show" do
     @controller.stub!(:admin_required).and_return(true)
     @controller.stub!(:logged_in?).and_return(false)
   end
-
-  it "does not set session[:forums]" do
-    act!
-    session[:forums].should be_nil
-  end
+  
+  it.assigns_session :forums => :undefined, :forum_page => :undefined
+  it.assigns :topics, :forum
+  it.renders :template, :show
   
   it "sets session[:forums] if logged in" do
     @controller.stub!(:logged_in?).and_return(true)
@@ -90,78 +56,29 @@ describe ForumsController, "GET #show" do
     session[:forums][@forum.id].should == current_time
   end
   
-  it "does not set session[:forum_page]" do
-    act!
-    session[:forum_page].should be_nil
-  end
-  
-  it "sets session[:forums] if page number set" do
-    @forum.topics.stub!(:paginate).with(:page => '5').and_return(@topics)
-    act! :page => 5
-    session[:forum_page][@forum.id].should == 5
-  end
-
-  it "sets @topics" do
-    act!
-    assigns[:topics].should == @topics
-  end
-
-  it "sets @forum" do
-    act!
-    assigns[:forum].should == @forum
-  end
-  
-  it "renders show.html.erb" do
-    act!
-    response.should render_template('show')
-  end
-  
-  it "is successful" do
-    act!
-    response.should be_success
-  end
-  
-  it "renders as html" do
-    act!
-    response.content_type.should == Mime::HTML
-  end
-  
-  def act!(options = {})
-    get :show, options.merge(:id => 1)
+  describe ForumsController, "(paged)" do
+    define_models :stubbed
+    act! { get :show, :id => 1, :page => 5 }
+    before do
+      @forum.topics.stub!(:paginate).with(:page => '5').and_return(@topics)
+    end
+    
+    it.assigns_session :forum_page => lambda { {@forum.id => 5} }
   end
   
   describe ForumsController, "(xml)" do
     define_models :stubbed
+    
+    act! { get :show, :id => 1, :format => 'xml' }
 
-    it "not set @topics" do
-      act!
-      assigns[:topics].should be_nil
-    end
-
-    it "returns xml" do
-      act!
-      response.should have_text(@forum.to_xml)
-    end
-  
-    it "renders as xml" do
-      act!
-      response.content_type.should == Mime::XML
-    end
-
-    it "is successful" do
-      act!
-      response.should be_success
-    end
-
-    def act!
-      get :show, :id => 1, :format => 'xml'
-    end
+    it.assigns :topics => :undefined
+    it.renders :xml, :forum
   end
 end
 
 describe ForumsController, "GET #new" do
   define_models :stubbed
-
+  act! { get :new }
   before do
     @site   = sites(:default)
     @forum  = Forum.new
@@ -169,57 +86,25 @@ describe ForumsController, "GET #new" do
     @controller.stub!(:admin_required).and_return(true)
   end
 
-  it "sets @forum" do
+  it "assigns @forum" do
     act!
-    assigns[:forum].should be_new_record
+    @forum.should be_new_record
   end
   
-  it "renders new.html.erb" do
-    act!
-    response.should render_template('new')
-  end
-  
-  it "is successful" do
-    act!
-    response.should be_success
-  end
-  
-  it "renders as html" do
-    act!
-    response.content_type.should == Mime::HTML
-  end
-  
-  def act!
-    get :new
-  end  
+  it.renders :template, :new
   
   describe ForumsController, "(xml)" do
     define_models :stubbed
+    act! { get :new, :format => 'xml' }
 
-    it "returns xml" do
-      act!
-      response.should have_text(@forum.to_xml)
-    end
-  
-    it "renders as xml" do
-      act!
-      response.content_type.should == Mime::XML
-    end
-
-    it "is successful" do
-      act!
-      response.should be_success
-    end
-
-    def act!
-      get :new, :format => 'xml'
-    end
+    it.renders :xml, :forum
   end
 end
 
 describe ForumsController, "GET #edit" do
   define_models :stubbed
-
+  act! { get :edit, :id => 1 }
+  
   before do
     @site   = sites(:default)
     @forum  = forums(:default)
@@ -228,29 +113,8 @@ describe ForumsController, "GET #edit" do
     @controller.stub!(:admin_required).and_return(true)
   end
 
-  it "sets @forum" do
-    act!
-    assigns[:forum].should == @forum
-  end
-  
-  it "renders edit.html.erb" do
-    act!
-    response.should render_template('edit')
-  end
-  
-  it "is successful" do
-    act!
-    response.should be_success
-  end
-  
-  it "renders as html" do
-    act!
-    response.content_type.should == Mime::HTML
-  end
-  
-  def act!
-    get :edit, :id => 1
-  end
+  it.assigns :forum
+  it.renders :template, :edit
 end
 
 describe ForumsController, "POST #create" do
@@ -265,128 +129,54 @@ describe ForumsController, "POST #create" do
   
   describe ForumsController, "(successful creation)" do
     define_models :stubbed
+    act! { post :create, :forum => @attributes }
 
     before do
       @forum.stub!(:save).and_return(true)
     end
     
-    it "sets flash[:notice]" do
-      act!
-      flash[:notice].should_not be_nil
-    end
+    it.assigns_flash :notice => :not_nil
     
-    it "sets @forum" do
-      act!
-      assigns[:forum].should == @forum
-    end
-  
-    it "redirects to forum url" do
-      act!
-      response.should redirect_to(forum_path(@forum))
-    end
+    it.assigns :forum
+    it.redirects_to { forum_path(@forum) }
   end
   
   describe ForumsController, "(successful creation, xml)" do
     define_models :stubbed
+    act! { post :create, :forum => @attributes, :format => 'xml' }
 
     before do
       @forum.stub!(:save).and_return(true)
-    end
-    
-    it "sets @forum" do
-      act!
-      assigns[:forum].should == @forum
-    end
-    
-    it "returns created status" do
-      act!
-      response.code.should == "201"
-    end
-    
-    it "renders as xml" do
-      act!
-      response.content_type.should == Mime::XML
-    end
-    
-    it "sets location header for new record" do
-      act!
-      response.headers['Location'].should == forum_url(@forum)
-    end
-    
-    it "renders xml" do
       @forum.stub!(:to_xml).and_return("<forum />")
-      act!
-      response.should have_text(@forum.to_xml)
     end
-
-    def act!
-      post :create, :forum => @attributes, :format => 'xml'
-    end
+    
+    it.assigns :forum
+    it.renders :xml, :forum, :status => :created
+    it.assigns_headers :Location => lambda { forum_url(@forum) }
   end
 
   describe ForumsController, "(unsuccessful creation)" do
     define_models :stubbed
+    act! { post :create, :forum => @attributes }
 
     before do
       @forum.stub!(:save).and_return(false)
     end
     
-    it "sets @forum" do
-      act!
-      assigns[:forum].should == @forum
-    end
-  
-    it "is successful" do
-      act!
-      response.should be_success
-    end
-    
-    it "renders as html" do
-      act!
-      response.content_type.should == Mime::HTML
-    end
-  
-    it "renders new.html.erb" do
-      act!
-      response.should render_template('new')
-    end
+    it.assigns :forum
+    it.renders :template, :new
   end
   
   describe ForumsController, "(unsuccessful creation, xml)" do
     define_models :stubbed
+    act! { post :create, :forum => @attributes, :format => 'xml' }
 
     before do
       @forum.stub!(:save).and_return(false)
     end
     
-    it "sets @forum" do
-      act!
-      assigns[:forum].should == @forum
-    end
-  
-    it "returns content type of 422" do
-      act!
-      response.code.should == '422'
-    end
-
-    it "renders as xml" do
-      act!
-      response.content_type.should == Mime::XML
-    end
-    
-    it "renders xml" do
-      act!
-      response.should have_text(@forum.errors.to_xml)
-    end
-
-
-    def act!
-      post :create, :forum => @attributes, :format => 'xml'
-    end
-  end
-
-  def act!
-    post :create, :forum => @attributes
+    it.assigns :forum
+    it.renders :xml, "forum.errors".intern, :status => :unprocessable_entity
   end
 end
 
@@ -402,121 +192,59 @@ describe ForumsController, "PUT #update" do
   
   describe ForumsController, "(successful save)" do
     define_models :stubbed
+    act! { put :update, :id => 1, :forum => @attributes }
 
     before do
       @forum.stub!(:save).and_return(true)
     end
     
-    it "sets flash[:notice]" do
-      act!
-      flash[:notice].should_not be_nil
-    end
+    it.assigns_flash :notice => :not_nil
     
-    it "sets @forum" do
-      act!
-      assigns[:forum].should == @forum
-    end
-  
-    it "redirects to forum url" do
-      act!
-      response.should redirect_to(forum_path(@forum))
-    end
+    it.assigns :forum
+    it.redirects_to { forum_path(@forum) }
   end
   
   describe ForumsController, "(successful save, xml)" do
     define_models :stubbed
+    act! { put :update, :id => 1, :forum => @attributes, :format => 'xml' }
 
     before do
       @forum.stub!(:save).and_return(true)
     end
     
-    it "sets @forum" do
-      act!
-      assigns[:forum].should == @forum
-    end
-    
-    it "is successful" do
-      act!
-      response.should be_success
-    end
-    
-    it "renders empty response" do
-      act!
-      response.body.strip.should be_blank
-    end
-
-    def act!
-      put :update, :id => 1, :forum => @attributes, :format => 'xml'
-    end
+    it.assigns :forum
+    it.renders :blank
   end
 
   describe ForumsController, "(unsuccessful save)" do
     define_models :stubbed
+    act! { put :update, :id => 1, :forum => @attributes }
 
     before do
       @forum.stub!(:save).and_return(false)
     end
     
-    it "sets @forum" do
-      act!
-      assigns[:forum].should == @forum
-    end
-  
-    it "is successful" do
-      act!
-      response.should be_success
-    end
-    
-    it "renders as html" do
-      act!
-      response.content_type.should == Mime::HTML
-    end
-  
-    it "renders edit.html.erb" do
-      act!
-      response.should render_template('edit')
-    end
+    it.assigns :forum
+    it.renders :template, :edit
   end
   
   describe ForumsController, "(unsuccessful save, xml)" do
     define_models :stubbed
+    act! { put :update, :id => 1, :forum => @attributes, :format => 'xml' }
 
     before do
       @forum.stub!(:save).and_return(false)
     end
     
-    it "sets @forum" do
-      act!
-      assigns[:forum].should == @forum
-    end
-  
-    it "returns content type of 422" do
-      act!
-      response.code.should == '422'
-    end
-
-    it "renders as xml" do
-      act!
-      response.content_type.should == Mime::XML
-    end
-    
-    it "renders xml" do
-      act!
-      response.should have_text(@forum.errors.to_xml)
-    end
-
-    def act!
-      put :update, :id => 1, :forum => @attributes, :format => 'xml'
-    end
-  end
-
-  def act!
-    put :update, :id => 1, :forum => @attributes
+    it.assigns :forum
+    it.renders :xml, "forum.errors".intern, :status => :unprocessable_entity
   end
 end
 
 describe ForumsController, "DELETE #destroy" do
   define_models :stubbed
+  act! { delete :destroy, :id => 1 }
+  
   before do
     @forum      = forums(:default)
     @forum.stub!(:destroy)
@@ -526,39 +254,14 @@ describe ForumsController, "DELETE #destroy" do
     @controller.stub!(:admin_required).and_return(true)
   end
 
-  it "sets @forum" do
-    act!
-    assigns[:forum].should == @forum
-  end
-  
-  it "redirects to index" do
-    act!
-    response.should redirect_to(forums_path)
-  end
-  
-  def act!
-    delete :destroy, :id => 1
-  end
+  it.assigns :forum
+  it.redirects_to { forums_path }
   
   describe ForumsController, "(xml)" do
     define_models :stubbed
-    it "sets @forum" do
-      act!
-      assigns[:forum].should == @forum
-    end
-  
-    it "is successful" do
-      act!
-      response.should be_success
-    end
-    
-    it "renders empty response" do
-      act!
-      response.body.strip.should be_blank
-    end
-  
-    def act!
-      delete :destroy, :id => 1, :format => 'xml'
-    end
+    act! { delete :destroy, :id => 1, :format => 'xml' }
+
+    it.assigns :forum
+    it.renders :blank
   end
 end
