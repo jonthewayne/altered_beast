@@ -85,7 +85,7 @@ describe ForumsController, "GET #new" do
 
   it "assigns @forum" do
     act!
-    @forum.should be_new_record
+    assigns[:forum].should be_new_record
   end
   
   it.renders :template, :new
