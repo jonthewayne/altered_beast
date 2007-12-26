@@ -1,4 +1,6 @@
 class Spec::Example::AwesomeExample < Spec::Example::Example
+  @@variable_types = {:headers => :to_s, :flash => nil, :session => nil}
+
   def initialize(defined_description=nil, example_group=nil, &implementation)
     super(defined_description, &implementation)
     @example_group = example_group
@@ -32,6 +34,10 @@ class Spec::Example::AwesomeExample < Spec::Example::Example
   #
   #   it.assigns :foo => 'bar'
   #
+  # Check both instance variables:
+  #
+  #   it.assigns :foo, :bar => 'bar'
+  #
   # Check the instance variable is not nil:
   #
   #   it.assigns :foo => :not_nil # assigns[:foo].should_not be_nil
@@ -44,26 +50,35 @@ class Spec::Example::AwesomeExample < Spec::Example::Example
   #
   #   it.assigns :foo => :undefined # => controller.send(:instance_variables).should_not include("@foo")
   #
+  # Instance variables for :headers/:flash/:session are special and use the assigns_* methods.
+  #
+  #   it.assigns :foo => 'bar', 
+  #     :headers => { :Location => '...'    }, # it.assigns_headers :Location => ...
+  #     :flash   => { :notice   => :not_nil }, # it.assigns_flash :notice => ...
+  #     :session => { :user     => 1        }, # it.assigns_session :user => ...
+  #
   def assigns(*names)
-    if names.size == 1
-      if names.first.is_a?(Hash)
-        names.first.each do |key, value|
+    names.each do |name|
+      case name
+        when Symbol
           if @defined_description
-            desc, imp = assigns_example_values(key, value)
-            create_sub_example desc, &imp if @example_group
+            desc, imp = assigns_example_values(name, name)
+            create_sub_example desc, &imp
           else
-            @defined_description, @implementation = assigns_example_values(key, value)
+            @defined_description, @implementation = assigns_example_values(name, name)
           end
-        end
-      else
-        @defined_description, @implementation = assigns_example_values(names.first, names.first)
+        when Hash
+          name.each do |key, value|
+            if @@variable_types.key?(key.to_sym)
+              send("assigns_#{key}", value)
+            elsif @defined_description
+              desc, imp = assigns_example_values(key, value)
+              create_sub_example desc, &imp
+            else
+              @defined_description, @implementation = assigns_example_values(key, value)
+            end
+          end
       end
-    else
-      assigns(names.pop) # go forth and recurse!
-      names.each do |name|
-        desc, imp = assigns_example_values(name, name)
-        create_sub_example desc, &imp
-      end if @example_group
     end
   end
   
@@ -85,14 +100,7 @@ class Spec::Example::AwesomeExample < Spec::Example::Example
   #     :this_is_set => :not_nil
   #
   def assigns_flash(flash)
-    flash.each do |key, value|
-      if @defined_description
-        desc, imp = assigns_flash_values(key, value)
-        create_sub_example desc, &imp
-      else
-        @defined_description, @implementation = assigns_flash_values(key, value)
-      end
-    end
+    raise NotImplementedError
   end
 
   # Check that the session variable(s) were assigned
@@ -103,14 +111,7 @@ class Spec::Example::AwesomeExample < Spec::Example::Example
   #     :this_is_set => :not_nil
   #
   def assigns_session(session)
-    session.each do |key, value|
-      if @defined_description
-        desc, imp = assigns_session_values(key, value)
-        create_sub_example desc, &imp
-      else
-        @defined_description, @implementation = assigns_session_values(key, value)
-      end
-    end
+    raise NotImplementedError
   end
 
   # Check that the HTTP header(s) were assigned
@@ -121,16 +122,45 @@ class Spec::Example::AwesomeExample < Spec::Example::Example
   #     :this_is_set => :not_nil
   #
   def assigns_headers(headers)
-    headers.each do |key, value|
-      if @defined_description
-        desc, imp = assigns_headers_values(key, value)
-        create_sub_example desc, &imp
-      else
-        @defined_description, @implementation = assigns_headers_values(key, value)
+    raise NotImplementedError
+  end
+
+  @@variable_types.each do |collection_type, collection_op|
+    public
+    define_method "assigns_#{collection_type}" do |values|
+      values.each do |key, value|
+        if @defined_description
+          desc, imp = send("assigns_#{collection_type}_values", key, value)
+          create_sub_example desc, &imp
+        else
+        @defined_description, @implementation = send("assigns_#{collection_type}_values", key, value)
+        end
       end
     end
+    
+    protected
+    define_method "assigns_#{collection_type}_values" do |key, value|
+      key = key.send(collection_op) if collection_op
+      ["assigns #{collection_type}[#{key.inspect}]", lambda do
+        acting do |resp|
+          collection = resp.send(collection_type)
+          case value
+            when nil
+              collection[key].should be_nil
+            when :not_nil
+              collection[key].should_not be_nil
+            when :undefined
+              collection.should_not include(key)
+            when Proc
+              collection[key].should == instance_eval(&value)
+            else
+              collection[key].should == value
+          end
+        end
+      end]
+    end
   end
-  
+
 protected
   # Creates 2 examples:  One to check that the body is blank,
   # and the other to check the status.  It looks for one option:
@@ -147,7 +177,7 @@ protected
         response.body.strip.should be_blank
       end
     end
-    assert_status options[:status] if @example_group
+    assert_status options[:status]
   end
 
   # Creates 3 examples: One to check that the given template was rendered.
@@ -168,10 +198,8 @@ protected
     @implementation = lambda do
       acting.should render_template(template_name.to_s)
     end
-    if @example_group
-      assert_status options[:status]
-      assert_content_type options[:format]
-    end
+    assert_status options[:status]
+    assert_content_type options[:format]
   end
 
   # Creates 3 examples: One to check that the given XML was returned.
@@ -213,10 +241,8 @@ protected
       block ||= lambda { record.to_xml }
       acting.should have_text block.call
     end
-    if @example_group
-      assert_status options[:status]
-      assert_content_type options[:format] || :xml
-    end
+    assert_status options[:status]
+    assert_content_type options[:format] || :xml
   end
 
   def assigns_example_values(name, value)
@@ -235,29 +261,6 @@ protected
     end]
   end
   
-  {:headers => :to_s, :flash => nil, :session => nil}.each do |collection_type, collection_op|
-    define_method "assigns_#{collection_type}_values" do |key, value|
-      key = key.send(collection_op) if collection_op
-      ["assigns #{collection_type}[#{key.inspect}]", lambda do
-        acting do |resp|
-          collection = resp.send(collection_type)
-          case value
-            when nil
-              collection[key].should be_nil
-            when :not_nil
-              collection[key].should_not be_nil
-            when :undefined
-              collection.should_not include(key)
-            when Proc
-              collection[key].should == instance_eval(&value)
-            else
-              collection[key].should == value
-          end
-        end
-      end]
-    end
-  end
-
   def assert_content_type(type = :html)
     mime = Mime::Type.lookup_by_extension((type || :html).to_s)
     create_sub_example "renders with Content-Type of #{mime}" do
@@ -286,6 +289,6 @@ protected
   end
   
   def create_sub_example(desc, &imp)
-    @example_group.send(:example_objects) << Spec::Example::AwesomeExample.new(desc, @example_group, &imp)
+    @example_group.send(:example_objects) << Spec::Example::AwesomeExample.new(desc, @example_group, &imp) if @example_group
   end
 end

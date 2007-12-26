@@ -14,10 +14,8 @@ describe ForumsController, "GET #index" do
     session[:forum_page] = 5
   end
   
-  it.assigns :forums
+  it.assigns :forums, :session => { :forum_page => nil }
   it.renders :template, :index
-  it.assigns_session :forum_page => nil
-  
   
   
   describe ForumsController, "(xml)" do
@@ -46,8 +44,7 @@ describe ForumsController, "GET #show" do
     @controller.stub!(:logged_in?).and_return(false)
   end
   
-  it.assigns_session :forums => :undefined, :forum_page => :undefined
-  it.assigns :topics, :forum
+  it.assigns :topics, :forum, :session => { :forums => :undefined, :forum_page => :undefined }
   it.renders :template, :show
   
   it "sets session[:forums] if logged in" do
@@ -63,7 +60,7 @@ describe ForumsController, "GET #show" do
       @forum.topics.stub!(:paginate).with(:page => '5').and_return(@topics)
     end
     
-    it.assigns_session :forum_page => lambda { {@forum.id => 5} }
+    it.assigns :session => { :forum_page => lambda { {@forum.id => 5} } }
   end
   
   describe ForumsController, "(xml)" do
@@ -135,9 +132,7 @@ describe ForumsController, "POST #create" do
       @forum.stub!(:save).and_return(true)
     end
     
-    it.assigns_flash :notice => :not_nil
-    
-    it.assigns :forum
+    it.assigns :forum, :flash => { :notice => :not_nil }
     it.redirects_to { forum_path(@forum) }
   end
   
@@ -150,9 +145,8 @@ describe ForumsController, "POST #create" do
       @forum.stub!(:to_xml).and_return("<forum />")
     end
     
-    it.assigns :forum
+    it.assigns :forum, :headers => { :Location => lambda { forum_url(@forum) } }
     it.renders :xml, :forum, :status => :created
-    it.assigns_headers :Location => lambda { forum_url(@forum) }
   end
 
   describe ForumsController, "(unsuccessful creation)" do
@@ -198,9 +192,7 @@ describe ForumsController, "PUT #update" do
       @forum.stub!(:save).and_return(true)
     end
     
-    it.assigns_flash :notice => :not_nil
-    
-    it.assigns :forum
+    it.assigns :forum, :flash => { :notice => :not_nil }
     it.redirects_to { forum_path(@forum) }
   end
   
