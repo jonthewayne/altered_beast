@@ -33,3 +33,5 @@ ModelStubbing.define_models do
   model Moderatorship
   model Monitorship
 end
+
+ModelStubbing.define_models :stubbed, :insert => false

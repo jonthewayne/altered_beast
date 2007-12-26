@@ -24,6 +24,11 @@ class Site < ActiveRecord::Base
     sites.reject { |s| s.default? }.first || sites.first
   end
   
+  # <3 rspec
+  def ordered_forums(*args)
+    forums.find_ordered(*args)
+  end
+  
   def default?
     host.blank?
   end
