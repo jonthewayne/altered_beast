@@ -14,6 +14,7 @@ describe SitesController, "GET #index" do
   before do
     @sites = [sites(:default), sites(:other)]
     Site.stub!(:find).with(:all).and_return(@sites)
+    @controller.stub!(:admin_required).and_return(true)
   end
   
   it.assigns :sites
@@ -38,6 +39,7 @@ describe SitesController, "GET #show" do
   before do
     @site  = sites(:default)
     Site.stub!(:find).with('1').and_return(@site)
+    @controller.stub!(:admin_required).and_return(true)
   end
   
   it.assigns :site
@@ -81,6 +83,7 @@ describe SitesController, "GET #edit" do
   before do
     @site  = sites(:default)
     Site.stub!(:find).with('1').and_return(@site)
+    @controller.stub!(:admin_required).and_return(true)
   end
 
   it.assigns :site
@@ -149,6 +152,7 @@ describe SitesController, "PUT #update" do
     @attributes = {}
     @site = sites(:default)
     Site.stub!(:find).with('1').and_return(@site)
+    @controller.stub!(:admin_required).and_return(true)
   end
   
   describe SitesController, "(successful save)" do
@@ -208,6 +212,7 @@ describe SitesController, "DELETE #destroy" do
     @site = sites(:default)
     @site.stub!(:destroy)
     Site.stub!(:find).with('1').and_return(@site)
+    @controller.stub!(:admin_required).and_return(true)
   end
 
   it.assigns :site
