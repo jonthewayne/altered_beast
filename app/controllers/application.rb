@@ -7,12 +7,12 @@ class ApplicationController < ActionController::Base
   include AuthenticatedSystem
   helper :all
   
-
   # See ActionController::RequestForgeryProtection for details
   # Uncomment the :secret if you're not using the cookie session store
   protect_from_forgery # :secret => 'e125a4be589f9d81263920581f6e4182'
   
   rescue_from NoSiteDefinedError, :with => :handle_no_site
+
   before_filter :require_site
   def require_site
     current_site or raise NoSiteDefinedError
