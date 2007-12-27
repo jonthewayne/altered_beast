@@ -1,4 +1,9 @@
 class User
+  after_create :set_first_user_as_activated
+  def set_first_user_as_activated
+    activate! if User.count == 1 # self
+  end
+  
   def remember_token?
     active? && remember_token_expires_at && Time.now.utc < remember_token_expires_at 
   end
