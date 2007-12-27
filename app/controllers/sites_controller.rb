@@ -1,6 +1,6 @@
 class SitesController < ApplicationController
   def index
-    @sites = Site.find(:all)
+    @sites = Site.find(:all, :order => 'host')
 
     respond_to do |format|
       format.html # index.html.erb
