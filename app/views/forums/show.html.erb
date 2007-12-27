@@ -10,7 +10,7 @@
 <% unless @forum.moderators.empty? -%>
 <ul class="flat" style="margin-top:1em;">
 <% @forum.moderators.each do |user| -%>
-  <li><%= link_to user.display_name, user_path(user) %></li>
+  <li><%= link_to h(user.display_name || user.login), user %></li>
 <% end -%>
 </ul>
 <% else -%>
@@ -91,5 +91,5 @@
 <%= pagination @topics %>
 
 <% if logged_in? %>
-<p><%= link_to 'New topic'[:new_topic], "TODO:new_topic_path(@forum)", :class => "utility" %></p>
+<p><%= link_to 'New topic'[:new_topic], new_forum_topic_path(@forum), :class => "utility" %></p>
 <% end%>

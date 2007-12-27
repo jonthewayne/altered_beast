@@ -14,11 +14,13 @@
 <% end %>
 
 <h1 style="margin-top:0;"><%= 'Sites'[:sites_title] %></h1>
+<%= pagination @sites %>
 
 <table border="0" cellspacing="0" cellpadding="0" class="wide forums">
   <tr>
-    <th class="la" width="70%"><%= 'Site'[:forum_title] %></th>
-    <th class="la" width="10%"><%= 'Users'[:user_title] %></th>
+    <th class="la" width="60%"><%= 'Site'[:forum_title] %></th>
+    <th class="la" width="15%"><%= 'Forums'[:forum_title] %></th>
+    <th class="la" width="15%"><%= 'Users'[:user_title] %></th>
     <th class="la" width="10%">&nbsp;</th>
   </tr>
 <% @sites.each do |site| -%>  
@@ -26,6 +28,9 @@
     <td class="c1 vat">
       <%= link_to h(site.name), (site.default? ? root_path : root_url(:host => site.host)), :class => "title" %>
 			<%= content_tag(:small, "(#{h(site.host)})") unless site.default? -%>
+    </td>
+    <td class="c2">
+      <%= link_to pluralize(site.forums.count, 'Forum'[:forum]), forums_path(:host => site.host) %>
     </td>
     <td class="c2">
       <%= link_to pluralize(site.users.count, 'User'[:user]), users_path(:host => site.host) %>
@@ -36,3 +41,6 @@
   </tr>
 <% end %>
 </table>
+
+<%= next_page @sites %>
+<%= pagination @sites %>
