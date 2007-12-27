@@ -68,12 +68,18 @@ describe UsersController do
     flash[:notice].should be_nil
   end
   
-  it 'logs in the first user' do
+  it 'logs in the first user and activates as admin' do
     User.delete_all
     create_user
     user = User.find_by_login('quire')
     assigns[:current_user].should == user
     assigns[:current_user].should be_admin
+    assigns[:current_user].should be_active
+  end
+  
+  it "sends an email to the user on create" do
+    pending "Email functionality has not been written"
+    lambda{ create_user }.should change(ActionMailer::Base.deliveries, :size).by(1)
   end
   
   def create_user(options = {})
