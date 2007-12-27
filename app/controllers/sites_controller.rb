@@ -2,7 +2,7 @@ class SitesController < ApplicationController
   before_filter :admin_required, :only => [ :destroy, :update, :edit ]
 
   def index
-    @sites = Site.find(:all)
+    @sites = Site.paginate(:all, :page => params[:page])
 
     respond_to do |format|
       format.html # index.html.erb
