@@ -11,12 +11,12 @@ describe ForumsController, "GET #index" do
     @site.stub!(:ordered_forums).and_return(@forums)
     @controller.stub!(:current_site).and_return(@site)
     @controller.stub!(:admin_required).and_return(true)
-    session[:forum_page] = 5
+    session[:forums_page] = {1 => 5}
+    @forum_time = session[:forums] = {1 => 5.minutes.ago.utc}
   end
   
-  it.assigns :forums, :session => { :forum_page => nil }
+  it.assigns :forums, :session => {:forums_page => {}, :forums => lambda { @forum_time }}
   it.renders :template, :index
-  
   
   describe ForumsController, "(xml)" do
     define_models :stubbed
@@ -42,9 +42,11 @@ describe ForumsController, "GET #show" do
     @controller.stub!(:current_site).and_return(@site)
     @controller.stub!(:admin_required).and_return(true)
     @controller.stub!(:logged_in?).and_return(false)
+    @forum_page = session[:forums_page] = {@forum.id => 1}
+    @forum_time = session[:forums]      = {@forum.id => Time.utc(2007, 1, 1)}
   end
   
-  it.assigns :topics, :forum, :session => { :forums => :undefined, :forum_page => :undefined }
+  it.assigns :topics, :forum, :session => {:forums_page => lambda { @forum_page }, :forums => lambda { @forum_time }}
   it.renders :template, :show
   
   it "sets session[:forums] if logged in" do
@@ -60,7 +62,7 @@ describe ForumsController, "GET #show" do
       @forum.topics.stub!(:paginate).with(:page => '5').and_return(@topics)
     end
     
-    it.assigns :session => { :forum_page => lambda { {@forum.id => 5} } }
+    it.assigns :session => { :forums_page => lambda { {@forum.id => 5} } }
   end
   
   describe ForumsController, "(xml)" do

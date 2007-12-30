@@ -5,7 +5,7 @@ class ForumsController < ApplicationController
   # GET /forums.xml
   def index
     # reset the page of each forum we have visited when we go back to index
-    session[:forum_page] = nil
+    session[:forums_page].clear
 
     @forums = current_site.ordered_forums
 
@@ -19,8 +19,8 @@ class ForumsController < ApplicationController
   # GET /forums/1.xml
   def show
     @forum = current_site.forums.find(params[:id])
-    (session[:forums] ||= {})[@forum.id] = Time.now.utc if logged_in?
-    (session[:forum_page] ||= Hash.new(1))[@forum.id] = params[:page].to_i if params[:page]
+    session[:forums][@forum.id]      = Time.now.utc       if logged_in?
+    session[:forums_page][@forum.id] = params[:page].to_i if params[:page]
 
     respond_to do |format|
       format.html do # show.html.erb
