@@ -1,13 +1,7 @@
 require File.dirname(__FILE__) + '/../spec_helper'
 
 describe User do
-  define_models do 
-    model User do
-      stub :admin,     :login => 'admin-user',     :email => 'admin-user@example.com', :remember_token => 'blah'
-      stub :pending,   :login => 'pending-user',   :email => 'pending-user@example.com',   :state => 'pending', :activated_at => nil, :remember_token => 'asdf'
-      stub :suspended, :login => 'suspended-user', :email => 'suspended-user@example.com', :state => 'suspended', :remember_token => 'dfdfd'
-    end
-  end
+  define_models :users
 
   it 'creates user' do
     lambda do

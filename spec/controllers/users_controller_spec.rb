@@ -1,7 +1,7 @@
 require File.dirname(__FILE__) + '/../spec_helper'
 
 describe UsersController do
-  define_models
+  define_models :users
 
   it 'allows signup' do
     lambda do
