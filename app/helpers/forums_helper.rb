@@ -4,4 +4,18 @@ module ForumsHelper
     return false unless logged_in? && forum.recent_topic
     return forum.recent_topic.replied_at > (session[:forums][forum.id] || last_active)
   end
+
+  def topic_count
+    pluralize current_site.topics.count, 'topic'
+  end
+  
+  def post_count
+    pluralize current_site.topics.sum('topics.posts_count'), 'post'
+  end
+  
+  # Ripe for optimization
+  def voice_count
+    pluralize current_site.topics.to_a.sum { |t| t.voice_count }, 'voice'
+  end
+
 end

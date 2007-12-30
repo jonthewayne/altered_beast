@@ -1,3 +1,4 @@
+<h1><%=h @site.name %></h1>
 
-<%= link_to 'Edit', edit_site_path(@site) %> |
-<%= link_to 'Back', sites_path %>
+<% if admin? %><%= link_to 'Edit', edit_site_path(@site) %> |<% end %>
+<%= link_to 'Sites', sites_path %>

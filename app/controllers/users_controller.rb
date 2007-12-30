@@ -52,6 +52,10 @@ class UsersController < ApplicationController
     @user.destroy
     redirect_to users_path
   end
+  
+  def index
+    @users = current_site.users.paginate :all, :page => params[:page]
+  end
 
 protected
   def find_user

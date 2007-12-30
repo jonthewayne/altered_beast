@@ -13,7 +13,9 @@ describe SitesController, "GET #index" do
 
   before do
     @sites = [sites(:default), sites(:other)]
-    Site.stub!(:find).with(:all).and_return(@sites)
+    Site.stub!(:paginate).with(:all, :page => params[:page], :order => 'host ASC').and_return(@sites)
+    @controller.stub!(:admin_required).and_return(true)
+    @controller.stub!(:require_site)
   end
   
   it.assigns :sites
@@ -38,6 +40,8 @@ describe SitesController, "GET #show" do
   before do
     @site  = sites(:default)
     Site.stub!(:find).with('1').and_return(@site)
+    @controller.stub!(:admin_required).and_return(true)
+    @controller.stub!(:require_site)
   end
   
   it.assigns :site
@@ -56,12 +60,18 @@ describe SitesController, "GET #new" do
   define_models :sites_controller
   act! { get :new }
   before do
-    @site  = Site.new
+    @site  = Site.new :host => 'test.host'
   end
 
   it "assigns @site" do
     act!
     assigns[:site].should be_new_record
+  end
+  
+  it "assigns current host to new @site" do
+    request.host = "my.host"
+    act!
+    assigns[:site].host.should == "my.host"
   end
   
   it.renders :template, :new
@@ -81,6 +91,8 @@ describe SitesController, "GET #edit" do
   before do
     @site  = sites(:default)
     Site.stub!(:find).with('1').and_return(@site)
+    @controller.stub!(:admin_required).and_return(true)
+    @controller.stub!(:require_site)
   end
 
   it.assigns :site
@@ -90,7 +102,7 @@ end
 describe SitesController, "POST #create" do
   before do
     @attributes = {}
-    @site = mock_model Site, :new_record? => false, :errors => []
+    @site = mock_model Site, :new_record? => false, :errors => [], :host => "foo.com"
     Site.stub!(:new).with(@attributes).and_return(@site)
   end
   
@@ -103,7 +115,7 @@ describe SitesController, "POST #create" do
     end
     
     it.assigns :site, :flash => { :notice => :not_nil }
-    it.redirects_to { site_path(@site) }
+    it.redirects_to { signup_path(:host => @site.host) }
   end
   
   describe SitesController, "(successful creation, xml)" do
@@ -149,6 +161,8 @@ describe SitesController, "PUT #update" do
     @attributes = {}
     @site = sites(:default)
     Site.stub!(:find).with('1').and_return(@site)
+    @controller.stub!(:admin_required).and_return(true)
+    @controller.stub!(:require_site)
   end
   
   describe SitesController, "(successful save)" do
@@ -208,6 +222,8 @@ describe SitesController, "DELETE #destroy" do
     @site = sites(:default)
     @site.stub!(:destroy)
     Site.stub!(:find).with('1').and_return(@site)
+    @controller.stub!(:admin_required).and_return(true)
+    @controller.stub!(:require_site)
   end
 
   it.assigns :site

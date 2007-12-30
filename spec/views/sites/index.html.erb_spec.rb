@@ -4,10 +4,10 @@ describe "/sites/index.html.erb" do
   include SitesHelper
   
   before do
-    site_98 = mock_model(Site)
-    site_99 = mock_model(Site)
+    #site_98 = mock_model(Site)
+    #site_99 = mock_model(Site)
 
-    assigns[:sites] = [site_98, site_99]
+    assigns[:sites] = Site.paginate(:all, :page => 1) #[site_98, site_99]
   end
 
   it "should render list of sites" do

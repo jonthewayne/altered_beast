@@ -1,14 +1,15 @@
+<%= form.error_messages %>
 <table border="0" cellspacing="0" cellpadding="0" class="noborder nopad wide" id="site_name">
 	<tr>
 	  <td>
-	    <label><%= 'Name'[:site_title] %></label><br />
+	    <label for="site_name"><%= 'Name'[:site_title] %></label><br />
 	    <%= form.text_field :name, :class => "primary" %>
 	  </td>
 	</tr>
 	<tr>
 	  <td>
-	    <label><%= 'Host'[:site_host] %></label><br />
-	    <%= form.text_field :host %>
+	    <label for="site_host"><%= 'Host'[:site_host] %></label><br />
+	    http://<%= form.text_field :host %>
 	  </td>
 	</tr>
 </table>

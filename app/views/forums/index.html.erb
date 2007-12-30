@@ -16,9 +16,7 @@
 <h1 style="margin-top:0;"><%= 'Forums'[:forums_title] %></h1>
 <p class="subtitle">
 <%= feed_icon_tag "Recent Posts"[:recent_posts], "TODO:formatted_all_posts_path(:format => 'rss')" %>
-<%# TODO: '{count} topic(s)'[(count=Topic.count)==1 ? :topic_count : :topics_count, number_with_delimiter(count)] %>, 
-<%# TODO: '{count} post(s)'[(count=Post.count)==1 ? :post_count : :posts_count, number_with_delimiter(count)] %>, <%= '{count} voice(s)'[(count=0||User.count(:conditions => "posts_count > 0"))==1 ? :voice_count : :voices_count, number_with_delimiter(count)] %>
-  
+<%= topic_count %>, <%= post_count %>, <%= voice_count %>
 </p>
 
 <table border="0" cellspacing="0" cellpadding="0" class="wide forums">

@@ -1,0 +1,44 @@
+<% content_for :right do %>
+<h5><%= 'Find a User'[] %></h5>
+
+<% form_tag users_path, :method => 'get' do -%>
+<p>
+<label><%= 'Display name or login'[] %></label>
+<%= text_field_tag :q, params[:q] %> 
+<%= submit_tag "Search"[:search_title] %></p>
+<% end -%>
+
+<% end -%>
+
+<h1 style="margin-top:0;"><%= 'Users'[:users_title] %></h1>
+<p class="subtitle">
+  <%= user_count %>, <%= active_user_count %>, <%= lurking_user_count %>
+</p>
+
+<%= pagination @users %>
+
+<table border="0" cellspacing="0" cellpadding="0" class="wide forums">
+  <tr>
+    <th class="la" width="88%"><%= 'Name / Login'[:name_or_login] %></th>
+    <th><%= 'Website'[:website_title] %></th>
+    <th width="1%"><%= 'Posts'[:posts_title] %></th>
+  </tr>
+<% @users.each do |user|-%>  
+  <tr>
+    <td><%= link_to h(user.display_name || user.login), user, :class => (user.admin? ? "admin" : nil) %>
+      <span style="color:#666">
+      <%= "(admin)"[:admin_in_parens] if user.admin? %>
+      </span>
+      </td>
+    <td class="la">
+      <% unless user.website.blank? %>
+      <%= white_list link_to(user.website.gsub("http://",""), "http://" + user.website.gsub("http://","")) %>
+      <% end %>
+    </td>
+    <td class="ca inv"><%= user.posts.size %></td>
+  </tr>
+<% end %>
+</table>
+
+<%= next_page @users %>
+<%= pagination @users %>

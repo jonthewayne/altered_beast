@@ -1,6 +1,8 @@
 class SitesController < ApplicationController
+  before_filter :admin_required, :only => [ :destroy, :update, :edit ]
+
   def index
-    @sites = Site.find(:all, :order => 'host')
+    @sites = Site.paginate(:all, :page => params[:page], :order => 'host ASC')
 
     respond_to do |format|
       format.html # index.html.erb
@@ -18,7 +20,7 @@ class SitesController < ApplicationController
   end
 
   def new
-    @site = Site.new
+    @site = Site.new :host => request.host
 
     respond_to do |format|
       format.html # new.html.erb
@@ -36,7 +38,10 @@ class SitesController < ApplicationController
     respond_to do |format|
       if @site.save
         flash[:notice] = 'Site was successfully created.'
-        format.html { redirect_to(@site) }
+        flash[:notice] += ' Please create your account.' unless logged_in?
+        format.html do
+          redirect_to logged_in?? @site : signup_url
+        end
         format.xml  { render :xml => @site, :status => :created, :location => @site }
       else
         format.html { render :action => "new" }
@@ -69,4 +74,17 @@ class SitesController < ApplicationController
       format.xml  { head :ok }
     end
   end
+
+protected
+  def require_site
+    return if %w( new create ).include?(params[:action])
+    return if current_site.nil? or current_site.new_record?
+    current_site or raise NoSiteDefinedError
+  end
+
+  def handle_no_site
+    return false if %w( new create ).include?(params[:action])
+    redirect_to new_site_url
+  end
+
 end

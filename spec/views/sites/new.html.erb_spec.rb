@@ -1,11 +1,17 @@
 require File.dirname(__FILE__) + '/../../spec_helper'
 
+ModelStubbing.define_models :sites_controller, :copy => :stubbed, :insert => false do
+  model Site do
+    stub :new, :name => 'new site', :host => 'other.test.host', :new_record? => true
+  end
+end
+
 describe "/sites/new.html.erb" do
+  define_models :sites_controller
   include SitesHelper
   
   before do
-    @site = mock_model(Site)
-    @site.stub!(:new_record?).and_return(true)
+    @site = sites(:new)
     assigns[:site] = @site
   end
 
