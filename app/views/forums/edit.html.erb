@@ -8,5 +8,5 @@
      :url  => forum_path(@forum),
      :html => { :method => :put } do |f| -%>
 <%= render :partial => "form", :object => f %>
-<%= submit_tag 'Save Forum'[:save_forum], :or => link_to('Cancel'[:cancel], forums_path) %>
+<%= submit_tag 'Save Forum'[:save_forum] %> or <%= link_to('Cancel'[:cancel], forums_path) %>
 <% end -%>
