@@ -13,7 +13,7 @@ describe SessionsController, "POST /create" do
   act! { post :create, @login[:options].merge(:login => users(@login[:user]).login, :password => @login[:pass]) }
 
   it.assigns :flash => {:notice => :not_nil},
-    :session => {:user => :not_nil, :forums => {}, :forums_page => {}}
+    :session => {:user => :not_nil}
   it.redirects_to { '/' }
   
   it 'fails login and does not redirect' do

@@ -15,7 +15,7 @@ describe ForumsController, "GET #index" do
     @forum_time = session[:forums] = {1 => 5.minutes.ago.utc}
   end
   
-  it.assigns :forums, :session => {:forums_page => {}, :forums => lambda { @forum_time }}
+  it.assigns :forums, :session => {:forums_page => nil, :forums => lambda { @forum_time }}
   it.renders :template, :index
   
   describe ForumsController, "(xml)" do
