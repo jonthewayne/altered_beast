@@ -3,11 +3,23 @@ require File.dirname(__FILE__) + '/../spec_helper'
 describe User do
   define_models :users
 
-  it 'creates user' do
-    lambda do
-      user = create_user
-      violated "#{user.errors.full_messages.to_sentence}" if user.new_record?
-    end.should change(User, :count).by(1)
+  describe User, "being created" do
+    define_models :users
+  
+    before do
+      @creating_user = lambda do
+        user = create_user
+        violated "#{user.errors.full_messages.to_sentence}" if user.new_record?
+      end
+    end
+  
+    it 'increments User.count' do
+      @creating_user.should change(User, :count).by(1)
+    end
+  
+    it 'increments Site#users_count' do
+      @creating_user.should change { sites(:default).reload.users_count }.by(1)
+    end
   end
 
   [:login, :password, :password_confirmation, :email, :site_id].each do |attr|
@@ -97,9 +109,25 @@ describe User do
 protected
   def create_user(options = {})
     returning User.new({ :login => 'quire', :email => 'quire@example.com', :password => 'quire', :password_confirmation => 'quire' }.merge(options)) do |u|
-      u.site_id = options.key?(:site_id) ? options[:site_id] : 1
+      u.site_id = options.key?(:site_id) ? options[:site_id] : sites(:default).id
       u.save
     end
+  end
+end
+
+describe User, "being deleted" do
+  define_models :users
+
+  before do
+    @deleting_user = lambda { users(:default).destroy }
+  end
+
+  it 'increments User.count' do
+    @deleting_user.should change(User, :count).by(-1)
+  end
+
+  it 'increments Site#users_count' do
+    @deleting_user.should change { sites(:default).reload.users_count }.by(-1)
   end
 end
 

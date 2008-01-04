@@ -74,17 +74,4 @@ class SitesController < ApplicationController
       format.xml  { head :ok }
     end
   end
-
-protected
-  def require_site
-    return if %w( new create ).include?(params[:action])
-    return if current_site.nil? or current_site.new_record?
-    current_site or raise NoSiteDefinedError
-  end
-
-  def handle_no_site
-    return false if %w( new create ).include?(params[:action])
-    redirect_to new_site_url
-  end
-
 end

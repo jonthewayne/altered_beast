@@ -8,8 +8,8 @@ class ApplicationController < ActionController::Base
   # Uncomment the :secret if you're not using the cookie session store
   protect_from_forgery # :secret => 'e125a4be589f9d81263920581f6e4182'
 
-  before_filter :require_site
-  def require_site
-    current_site || redirect_to(new_site_path)
+  # raised in #current_site
+  rescue_from Site::UndefinedError do |e|
+    redirect_to new_site_path
   end
 end

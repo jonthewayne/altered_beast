@@ -19,13 +19,13 @@ ModelStubbing.define_models do
   
   model Topic do
     stub :forum => all_stubs(:forum), :user => all_stubs(:user), :title => "initial", :hits => 0, :sticky => 0, :posts_count => 1,
-      :last_post_id => 1000, :last_updated_at => current_time - 5.days
+      :last_post_id => 1000, :last_updated_at => current_time - 5.days, :site => all_stubs(:site)
     stub :other, :title => "Other", :last_updated_at => current_time - 4.days
     stub :other_forum, :forum => all_stubs(:other_forum)
   end
 
   model Post do
-    stub :topic => all_stubs(:topic), :forum => all_stubs(:forum), :user => all_stubs(:user), :body => 'initial', :created_at => current_time - 5.days
+    stub :topic => all_stubs(:topic), :forum => all_stubs(:forum), :user => all_stubs(:user), :body => 'initial', :created_at => current_time - 5.days, :site => all_stubs(:site)
     stub :other, :topic => all_stubs(:other_topic), :body => 'other', :created_at => current_time - 13.days
     stub :other_forum, :forum => all_stubs(:other_forum), :topic => all_stubs(:other_forum_topic)
   end

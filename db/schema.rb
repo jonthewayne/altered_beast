@@ -45,6 +45,7 @@ ActiveRecord::Schema.define(:version => 1) do
     t.datetime "updated_at"
     t.integer  "forum_id"
     t.text     "body_html"
+    t.integer  "site_id"
   end
 
   add_index "posts", ["created_at", "forum_id"], :name => "index_posts_on_forum_id"
@@ -56,6 +57,9 @@ ActiveRecord::Schema.define(:version => 1) do
     t.string   "host"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.integer  "topics_count", :default => 0
+    t.integer  "users_count",  :default => 0
+    t.integer  "posts_count",  :default => 0
   end
 
   create_table "topics", :force => true do |t|
@@ -71,6 +75,7 @@ ActiveRecord::Schema.define(:version => 1) do
     t.integer  "last_post_id"
     t.datetime "last_updated_at"
     t.integer  "last_user_id"
+    t.integer  "site_id"
   end
 
   add_index "topics", ["forum_id"], :name => "index_topics_on_forum_id"

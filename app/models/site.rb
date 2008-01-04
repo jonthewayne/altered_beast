@@ -6,9 +6,12 @@ class Site < ActiveRecord::Base
   
   has_many :forums
   has_many :topics, :through => :forums
+  has_many :posts,  :through => :forums
   
   validates_presence_of   :name
   validates_uniqueness_of :host
+  
+  attr_readonly :posts_count, :users_count, :topics_count
   
   def host=(value)
     write_attribute :host, value.to_s.downcase

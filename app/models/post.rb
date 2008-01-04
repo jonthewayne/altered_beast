@@ -7,7 +7,10 @@ class Post < ActiveRecord::Base
   # topic's forum (set by callback)
   belongs_to :forum, :counter_cache => true
   
-  validates_presence_of :user_id, :topic_id, :forum_id, :body
+  # topic's site (set by callback)
+  belongs_to :site, :counter_cache => true
+  
+  validates_presence_of :user_id, :site_id, :topic_id, :forum_id, :body
   validate :topic_is_not_locked
 
   after_create  :update_cached_fields
@@ -20,10 +23,7 @@ class Post < ActiveRecord::Base
   end
 
 protected
-  # using count isn't ideal but it gives us correct caches each time
   def update_cached_fields
-    #Forum.update_all ['posts_count = ?', Post.count(:id, :conditions => {:forum_id => forum_id})], ['id = ?', forum_id]
-    #User.update_posts_count(user_id)
     topic.update_cached_post_fields(self)
   end
   

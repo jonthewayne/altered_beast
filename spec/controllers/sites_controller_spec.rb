@@ -21,7 +21,6 @@ describe SitesController, "GET #index" do
   it.assigns :sites
   it.renders :template, :index
   
-  
   describe SitesController, "(xml)" do
     define_models :sites_controller
     

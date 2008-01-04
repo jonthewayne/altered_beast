@@ -22,6 +22,22 @@ describe Post, "being deleted" do
     end
   end
   
+  before do
+    @deleting_post = lambda { posts(:default).destroy }
+  end
+
+  it "decrements cached forum posts_count" do
+    @deleting_post.should change { forums(:default).reload.posts_count }.by(-1)
+  end
+  
+  it "decrements cached site posts_count" do
+    @deleting_post.should change { sites(:default).reload.posts_count }.by(-1)
+  end
+  
+  it "decrements cached user posts_count" do
+    @deleting_post.should change { users(:default).reload.posts_count }.by(-1)
+  end
+
   it "fixes last_user_id" do
     topics(:default).last_user_id = 1; topics(:default).save
     posts(:default).destroy

@@ -103,16 +103,24 @@ module TopicCreatePostHelper
       @creating_topic.should change { Post.count }.by(1)
     end
     
+    base.it "increments cached site topics_count" do
+      @creating_topic.should change { sites(:default).reload.topics_count }.by(1)
+    end
+    
     base.it "increments cached forum topics_count" do
-      @creating_topic.should change { forums(:default).reload.topics.size }.by(1)
+      @creating_topic.should change { forums(:default).reload.topics_count }.by(1)
+    end
+    
+    base.it "increments cached site posts_count" do
+      @creating_topic.should change { sites(:default).reload.posts_count }.by(1)
     end
     
     base.it "increments cached forum posts_count" do
-      @creating_topic.should change { forums(:default).reload.posts.size }.by(1)
+      @creating_topic.should change { forums(:default).reload.posts_count }.by(1)
     end
     
     base.it "increments cached user posts_count" do
-      @creating_topic.should change { users(:default).reload.posts.size }.by(1)
+      @creating_topic.should change { users(:default).reload.posts_count }.by(1)
     end
   end
 
@@ -210,15 +218,19 @@ describe Topic, "#post!" do
   end
   
   it "increments cached topic posts_count" do
-    @creating_post.should change { topics(:default).reload.posts.size }.by(1)
+    @creating_post.should change { topics(:default).reload.posts_count }.by(1)
   end
   
   it "increments cached forum posts_count" do
-    @creating_post.should change { forums(:default).reload.posts.size }.by(1)
+    @creating_post.should change { forums(:default).reload.posts_count }.by(1)
+  end
+  
+  it "increments cached site posts_count" do
+    @creating_post.should change { sites(:default).reload.posts_count }.by(1)
   end
   
   it "increments cached user posts_count" do
-    @creating_post.should change { users(:default).reload.posts.size }.by(1)
+    @creating_post.should change { users(:default).reload.posts_count }.by(1)
   end
 
   def post!
@@ -249,15 +261,23 @@ describe Topic, "being deleted" do
   end
   
   it "decrements cached forum topics_count" do
-    @deleting_topic.should change { forums(:default).reload.topics.size }.by(-1)
+    @deleting_topic.should change { forums(:default).reload.topics_count }.by(-1)
   end
   
   it "decrements cached forum posts_count" do
-    @deleting_topic.should change { forums(:default).reload.posts.size }.by(-1)
+    @deleting_topic.should change { forums(:default).reload.posts_count }.by(-1)
+  end
+  
+  it "decrements cached site topics_count" do
+    @deleting_topic.should change { sites(:default).reload.topics_count }.by(-1)
+  end
+  
+  it "decrements cached site posts_count" do
+    @deleting_topic.should change { sites(:default).reload.posts_count }.by(-1)
   end
   
   it "decrements cached user posts_count" do
-    @deleting_topic.should change { users(:default).reload.posts.size }.by(-1)
+    @deleting_topic.should change { users(:default).reload.posts_count }.by(-1)
   end
 end
 

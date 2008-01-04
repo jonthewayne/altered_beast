@@ -1,7 +1,7 @@
 module UsersHelper
 
   def user_count
-    pluralize current_site.users.count, 'user'[:user]
+    pluralize current_site.users.size, 'user'[:user]
   end
   
   def active_user_count

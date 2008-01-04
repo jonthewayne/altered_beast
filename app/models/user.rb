@@ -1,7 +1,7 @@
 class User < ActiveRecord::Base
   concerned_with :validation, :states, :activation
 
-  belongs_to :site
+  belongs_to :site, :counter_cache => true
   validates_presence_of :site_id
   
   has_many :posts
