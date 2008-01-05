@@ -122,11 +122,11 @@ describe User, "being deleted" do
     @deleting_user = lambda { users(:default).destroy }
   end
 
-  it 'increments User.count' do
+  it 'decrements User.count' do
     @deleting_user.should change(User, :count).by(-1)
   end
 
-  it 'increments Site#users_count' do
+  it 'decrements Site#users_count' do
     @deleting_user.should change { sites(:default).reload.users_count }.by(-1)
   end
 end
