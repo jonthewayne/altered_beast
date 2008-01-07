@@ -33,8 +33,6 @@ describe User do
   
   it "sets User#display_name from login if nil" do
     user = User.new :login => 'foo'
-    user.display_name.should be_blank
-    user.valid?
     user.display_name.should == user.login
   end
   

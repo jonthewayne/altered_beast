@@ -3,7 +3,6 @@ class User < ActiveRecord::Base
 
   belongs_to :site, :counter_cache => true
   validates_presence_of :site_id
-  before_validation { |u| u.display_name = u.login if u.display_name.blank? }
   
   has_many :posts
   has_many :topics
@@ -19,6 +18,11 @@ class User < ActiveRecord::Base
   end
   
   attr_readonly :posts_count, :last_seen_at
+
+  def display_name
+    n = read_attribute(:display_name)
+    n.blank? ? login : n
+  end
 
   # this is used to keep track of the last time a user has been seen (reading a topic)
   # it is used to know when topics are new or old and which should have the green
