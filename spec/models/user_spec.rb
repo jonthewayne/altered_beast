@@ -30,6 +30,20 @@ describe User do
       end.should_not change(User, :count)
     end
   end
+  
+  it "sets User#display_name from login if nil" do
+    user = User.new :login => 'foo'
+    user.display_name.should be_blank
+    user.valid?
+    user.display_name.should == user.login
+  end
+  
+  it "#seen! sets #last_seen_at" do
+    user = users(:default)
+    user.last_seen_at.should be_nil
+    user.seen!
+    user.last_seen_at.should_not be_nil
+  end
 
   it 'resets password' do
     users(:default).update_attributes(:password => 'new password', :password_confirmation => 'new password')
