@@ -57,6 +57,10 @@ class Topic < ActiveRecord::Base
       post.save
     end
   end
+  
+  def editable_by?(user)
+    true
+  end
 
   def sticky?
     sticky == 1

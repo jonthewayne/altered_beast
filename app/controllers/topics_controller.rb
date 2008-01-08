@@ -1,0 +1,88 @@
+class TopicsController < ApplicationController
+  before_filter :find_forum, :except => :index
+  before_filter :find_topic, :only => [:show, :edit, :update, :destroy]
+
+  def index
+    respond_to do |format|
+      format.html { redirect_to forum_path(params[:forum_id]) }
+      format.xml  do
+        @topics = find_forum.topics.paginate(:page => params[:page])
+        render :xml  => @topics
+      end
+    end
+  end
+  
+  def edit
+  end
+
+  def show
+    respond_to do |format|
+      format.html do
+        if logged_in?
+          current_user.seen!
+          (session[:topics] ||= {})[@topic.id] = Time.now.utc
+        end
+        
+        @topic.hit! unless logged_in? && @topic.user_id == current_user.id
+        @posts = @topic.posts.paginate :page => params[:page]
+        @post  = Post.new
+      end
+      format.xml  { render :xml  => @topic }
+    end
+  end
+
+  def new
+    @topic = Topic.new
+
+    respond_to do |format|
+      format.html # new.html.erb
+      format.xml  { render :xml  => @topic }
+    end
+  end
+
+  def create
+    @topic = @forum.topics.post!(params[:topic], current_user)
+
+    respond_to do |format|
+      if @topic.new_record?
+        format.html { render :action => "new" }
+        format.xml  { render :xml  => @topic.errors, :status => :unprocessable_entity }
+      else
+        flash[:notice] = 'Topic was successfully created.'
+        format.html { redirect_to(forum_topic_path(@forum, @topic)) }
+        format.xml  { render :xml  => @topic, :status => :created, :location => forum_topic_url(@forum, @topic) }
+      end
+    end
+  end
+
+  def update
+    respond_to do |format|
+      if @topic.update_attributes(params[:topic])
+        flash[:notice] = 'Topic was successfully updated.'
+        format.html { redirect_to(forum_topic_path(@forum, @topic)) }
+        format.xml  { head :ok }
+      else
+        format.html { render :action => "edit" }
+        format.xml  { render :xml  => @topic.errors, :status => :unprocessable_entity }
+      end
+    end
+  end
+
+  def destroy
+    @topic.destroy
+
+    respond_to do |format|
+      format.html { redirect_to(@forum) }
+      format.xml  { head :ok }
+    end
+  end
+
+protected
+  def find_forum
+    @forum = Forum.find(params[:forum_id])
+  end
+  
+  def find_topic
+    @topic = @forum.topics.find(params[:id])
+  end
+end
