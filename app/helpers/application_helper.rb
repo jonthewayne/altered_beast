@@ -19,6 +19,13 @@ module ApplicationHelper
     end
   end
 
+  def search_posts_title
+    returning(params[:q].blank? ? 'Recent Posts'[] : "Searching for"[] + " '#{h params[:q]}'") do |title|
+      title << " "+'by {user}'[:by_user,h(@user.display_name)] if @user
+      title << " "+'in {forum}'[:in_forum,h(@forum.name)] if @forum
+    end
+  end
+
   def topic_title_link(topic, options)
     if topic.title =~ /^\[([^\]]{1,15})\]((\s+)\w+.*)/
       "<span class='flag'>#{$1}</span>" + 
@@ -34,5 +41,23 @@ module ApplicationHelper
 
   def avatar_for(user, size=32)
     image_tag "http://www.gravatar.com/avatar.php?gravatar_id=#{MD5.md5(user.email)}&rating=PG&size=#{size}", :size => "#{size}x#{size}", :class => 'photo'
+  end
+
+  def search_path(atom = false)
+    options = params[:q].blank? ? {} : {:q => params[:q]}
+    prefix = 
+      if @topic
+        options.update :topic_id => @topic, :forum_id => @forum
+        :forum_topic
+      elsif @forum
+        options.update :forum_id => @forum
+        :forum
+      elsif @user
+        options.update :user_id => @user
+        :user
+      else
+        :search
+      end
+    atom ? send("formatted_#{prefix}_posts_path", options.update(:format => :atom)) : send("#{prefix}_posts_path", options)
   end
 end

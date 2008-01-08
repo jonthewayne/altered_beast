@@ -11,8 +11,9 @@ module PostsControllerParentObjects
       @forum.stub!(:topics).and_return([@topic])
       @forum.topics.stub!(:find).with('1').and_return(@topic)
       @topic.stub!(:posts).and_return([])
-      @topic.posts.stub!(:paginate).with(:page => '5').and_return(@posts)
+      @topic.posts.stub!(:search).with('foo', :page => '5').and_return(@posts)
       @topic.posts.stub!(:find).with('1').and_return(@post)
+      User.stub!(:index_from).and_return({users(:default).id => users(:default)})
     end
   end
 end
@@ -21,7 +22,7 @@ describe PostsController, "GET #index" do
   include PostsControllerParentObjects
   define_models :stubbed
 
-  act! { get :index, :forum_id => 1, :topic_id => 1, :page => 5 }
+  act! { get :index, :forum_id => 1, :topic_id => 1, :user => nil, :q => 'foo', :page => 5 }
   
   it.assigns :posts, :forum, :topic, :parent => lambda { @topic }
   it.renders :template, :index
@@ -29,9 +30,87 @@ describe PostsController, "GET #index" do
   describe PostsController, "(xml)" do
     define_models :stubbed
     
-    act! { get :index, :forum_id => 1, :topic_id => 1, :page => 5, :format => 'xml' }
+    act! { get :index, :forum_id => 1, :topic_id => 1, :user => nil, :q => 'foo', :page => 5, :format => 'xml' }
 
     it.assigns :posts, :forum, :topic, :parent => lambda { @topic }
+    it.renders :xml, :posts
+  end
+end
+
+describe PostsController, "GET #index (for forums)" do
+  define_models :stubbed
+
+  act! { get :index, :forum_id => 1, :page => 5, :q => 'foo' }
+
+  before do
+    @posts = []
+    @forum = forums(:default)
+    @forum.stub!(:posts).and_return([])
+    @forum.posts.stub!(:search).with('foo', :page => '5').and_return(@posts)
+    Forum.stub!(:find).with('1').and_return(@forum)
+    User.stub!(:index_from).and_return({users(:default).id => users(:default)})
+  end
+
+  it.assigns :posts, :forum, :topic => nil, :user => nil, :parent => lambda { @forum }
+  it.renders :template, :index
+
+  describe PostsController, "(xml)" do
+    define_models :stubbed
+    
+    act! { get :index, :forum_id => 1, :page => 5, :q => 'foo', :format => 'xml' }
+
+    it.assigns :posts, :forum, :topic => nil, :user => nil, :parent => lambda { @forum }
+    it.renders :xml, :posts
+  end
+end
+
+describe PostsController, "GET #index (for users)" do
+  define_models :stubbed
+
+  act! { get :index, :user_id => 1, :q => 'foo', :page => 5 }
+
+  before do
+    @posts = []
+    @user = users(:default)
+    @user.stub!(:posts).and_return([])
+    @user.posts.stub!(:search).with('foo', :page => '5').and_return(@posts)
+    User.stub!(:find).with('1').and_return(@user)
+    User.stub!(:index_from).and_return { raise("Nooooo") }
+  end
+
+  it.assigns :posts, :user, :forum => nil, :topic => nil, :parent => lambda { @user }
+  it.renders :template, :index
+
+  describe PostsController, "(xml)" do
+    define_models :stubbed
+    
+    act! { get :index, :user_id => 1, :page => 5, :q => 'foo', :format => 'xml' }
+
+    it.assigns :posts, :user, :forum => nil, :topic => nil, :parent => lambda { @user }
+    it.renders :xml, :posts
+  end
+end
+
+describe PostsController, "GET #index (globally)" do
+  define_models :stubbed
+
+  act! { get :index, :page => 5, :q => 'foo' }
+
+  before do
+    @posts = []
+    Post.stub!(:search).with('foo', :page => '5').and_return(@posts)
+    User.stub!(:index_from).and_return({users(:default).id => users(:default)})
+  end
+
+  it.assigns :posts, :user => nil, :forum => nil, :topic => nil, :parent => nil
+  it.renders :template, :index
+
+  describe PostsController, "(xml)" do
+    define_models :stubbed
+    
+    act! { get :index, :page => 5, :q => 'foo', :format => 'xml' }
+
+    it.assigns :posts, :user => nil, :forum => nil, :topic => nil, :parent => nil
     it.renders :xml, :posts
   end
 end

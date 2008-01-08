@@ -7,8 +7,8 @@ class PostsController < ApplicationController
   # /forums/1/posts
   # /forums/1/topics/1/posts
   def index
-    @posts = @parent.posts.paginate(:page => params[:page])
-
+    @posts = (@parent ? @parent.posts : Post).search(params[:q], :page => params[:page])
+    @users = @user ? {@user.id => @user} : User.index_from(@posts)
     respond_to do |format|
       format.html # index.html.erb
       format.xml  { render :xml  => @posts }
@@ -76,13 +76,12 @@ class PostsController < ApplicationController
 
 protected
   def find_parents
-    @parent = \
-      if params[:user_id]
-        @user = User.find(params[:user_id])
-      elsif params[:forum_id]
-        @forum = Forum.find(params[:forum_id])
-        @topic = @forum.topics.find(params[:topic_id]) if params[:topic_id]
-      end
+    if params[:user_id]
+      @parent = @user = User.find(params[:user_id])
+    elsif params[:forum_id]
+      @parent = @forum = Forum.find(params[:forum_id])
+      @parent = @topic = @forum.topics.find(params[:topic_id]) if params[:topic_id]
+    end
   end
   
   def find_post

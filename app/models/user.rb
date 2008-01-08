@@ -13,17 +13,25 @@ class User < ActiveRecord::Base
   has_many :monitorships, :dependent => :delete_all
   has_many :monitored_topics, :through => :monitorships, :source => :topic, :conditions => {"#{Monitorship.table_name}.active" => true}
   
+  attr_readonly :posts_count, :last_seen_at
+
+  def self.prefetch_from(records)
+    find(:all, :select => 'distinct *', :conditions => ['id in (?)', records.collect(&:user_id).uniq])
+  end
+  
+  def self.index_from(records)
+    prefetch_from(records).index_by(&:id)
+  end
+
   def moderator_of?(forum)
     Moderatorship.exists?(:user_id => id, :forum_id => forum.id)
   end
-  
-  attr_readonly :posts_count, :last_seen_at
 
   def display_name
     n = read_attribute(:display_name)
     n.blank? ? login : n
   end
-
+  
   # this is used to keep track of the last time a user has been seen (reading a topic)
   # it is used to know when topics are new or old and which should have the green
   # activity light next to them
