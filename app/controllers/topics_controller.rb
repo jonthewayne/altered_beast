@@ -1,12 +1,12 @@
 class TopicsController < ApplicationController
-  before_filter :find_forum, :except => :index
+  before_filter :find_forum
   before_filter :find_topic, :only => [:show, :edit, :update, :destroy]
 
   def index
     respond_to do |format|
-      format.html { redirect_to forum_path(params[:forum_id]) }
+      format.html { redirect_to forum_path(@forum) }
       format.xml  do
-        @topics = find_forum.topics.paginate(:page => params[:page])
+        @topics = find_forum.topics.paginate(:page => current_page)
         render :xml  => @topics
       end
     end
@@ -24,7 +24,7 @@ class TopicsController < ApplicationController
         end
         
         @topic.hit! unless logged_in? && @topic.user_id == current_user.id
-        @posts = @topic.posts.paginate :page => params[:page]
+        @posts = @topic.posts.paginate :page => current_page
         @post  = Post.new
       end
       format.xml  { render :xml  => @topic }
@@ -79,10 +79,10 @@ class TopicsController < ApplicationController
 
 protected
   def find_forum
-    @forum = Forum.find(params[:forum_id])
+    @forum = Forum.find_by_permalink(params[:forum_id])
   end
   
   def find_topic
-    @topic = @forum.topics.find(params[:id])
+    @topic = @forum.topics.find_by_permalink(params[:id])
   end
 end

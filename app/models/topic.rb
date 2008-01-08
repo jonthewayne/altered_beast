@@ -34,6 +34,8 @@ class Topic < ActiveRecord::Base
   attr_accessible :title, :body
 
   attr_readonly :posts_count, :hits
+  
+  has_permalink :title
 
   # Creates new topic and post.
   # Only..
@@ -84,6 +86,10 @@ class Topic < ActiveRecord::Base
     else
       self.destroy
     end
+  end
+  
+  def to_param
+    permalink
   end
 
 protected

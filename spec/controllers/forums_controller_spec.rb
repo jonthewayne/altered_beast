@@ -37,8 +37,8 @@ describe ForumsController, "GET #show" do
     @site   = sites(:default)
     @forum  = forums(:default)
     @topics = [topics(:default)]
-    @site.forums.stub!(:find).with('1').and_return(@forum)
-    @forum.topics.stub!(:paginate).with(:page => nil).and_return(@topics)
+    @site.forums.stub!(:find_by_permalink).with('1').and_return(@forum)
+    @forum.topics.stub!(:paginate).with(:page => 1).and_return(@topics)
     @controller.stub!(:current_site).and_return(@site)
     @controller.stub!(:admin_required).and_return(true)
     @controller.stub!(:logged_in?).and_return(false)
@@ -59,7 +59,7 @@ describe ForumsController, "GET #show" do
     define_models :stubbed
     act! { get :show, :id => 1, :page => 5 }
     before do
-      @forum.topics.stub!(:paginate).with(:page => '5').and_return(@topics)
+      @forum.topics.stub!(:paginate).with(:page => 5).and_return(@topics)
     end
     
     it.assigns :session => { :forums_page => lambda { {@forum.id => 5} } }
@@ -107,7 +107,7 @@ describe ForumsController, "GET #edit" do
   before do
     @site   = sites(:default)
     @forum  = forums(:default)
-    @site.forums.stub!(:find).with('1').and_return(@forum)
+    @site.forums.stub!(:find_by_permalink).with('1').and_return(@forum)
     @controller.stub!(:current_site).and_return(@site)
     @controller.stub!(:admin_required).and_return(true)
   end
@@ -181,7 +181,7 @@ describe ForumsController, "PUT #update" do
     @attributes = {'name' => "Default"}
     @forum      = forums(:default)
     @site       = sites(:default)
-    @site.forums.stub!(:find).with('1').and_return(@forum)
+    @site.forums.stub!(:find_by_permalink).with('1').and_return(@forum)
     @controller.stub!(:current_site).and_return(@site)
     @controller.stub!(:admin_required).and_return(true)
   end
@@ -243,7 +243,7 @@ describe ForumsController, "DELETE #destroy" do
     @forum      = forums(:default)
     @forum.stub!(:destroy)
     @site       = sites(:default)
-    @site.forums.stub!(:find).with('1').and_return(@forum)
+    @site.forums.stub!(:find_by_permalink).with('1').and_return(@forum)
     @controller.stub!(:current_site).and_return(@site)
     @controller.stub!(:admin_required).and_return(true)
   end

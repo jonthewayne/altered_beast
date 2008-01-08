@@ -7,11 +7,11 @@ module PostsControllerParentObjects
       @posts = []
       @forum = forums(:default)
       @topic = topics(:default)
-      Forum.stub!(:find).with('1').and_return(@forum)
+      Forum.stub!(:find_by_permalink).with('1').and_return(@forum)
       @forum.stub!(:topics).and_return([@topic])
-      @forum.topics.stub!(:find).with('1').and_return(@topic)
+      @forum.topics.stub!(:find_by_permalink).with('1').and_return(@topic)
       @topic.stub!(:posts).and_return([])
-      @topic.posts.stub!(:search).with('foo', :page => '5').and_return(@posts)
+      @topic.posts.stub!(:search).with('foo', :page => 5).and_return(@posts)
       @topic.posts.stub!(:find).with('1').and_return(@post)
       User.stub!(:index_from).and_return({users(:default).id => users(:default)})
     end
@@ -46,8 +46,8 @@ describe PostsController, "GET #index (for forums)" do
     @posts = []
     @forum = forums(:default)
     @forum.stub!(:posts).and_return([])
-    @forum.posts.stub!(:search).with('foo', :page => '5').and_return(@posts)
-    Forum.stub!(:find).with('1').and_return(@forum)
+    @forum.posts.stub!(:search).with('foo', :page => 5).and_return(@posts)
+    Forum.stub!(:find_by_permalink).with('1').and_return(@forum)
     User.stub!(:index_from).and_return({users(:default).id => users(:default)})
   end
 
@@ -73,8 +73,8 @@ describe PostsController, "GET #index (for users)" do
     @posts = []
     @user = users(:default)
     @user.stub!(:posts).and_return([])
-    @user.posts.stub!(:search).with('foo', :page => '5').and_return(@posts)
-    User.stub!(:find).with('1').and_return(@user)
+    @user.posts.stub!(:search).with('foo', :page => 5).and_return(@posts)
+    User.stub!(:find_by_permalink).with('1').and_return(@user)
     User.stub!(:index_from).and_return { raise("Nooooo") }
   end
 
@@ -98,7 +98,7 @@ describe PostsController, "GET #index (globally)" do
 
   before do
     @posts = []
-    Post.stub!(:search).with('foo', :page => '5').and_return(@posts)
+    Post.stub!(:search).with('foo', :page => 5).and_return(@posts)
     User.stub!(:index_from).and_return({users(:default).id => users(:default)})
   end
 

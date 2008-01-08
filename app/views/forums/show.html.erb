@@ -70,10 +70,9 @@
   <td class="c2">
     <%= "Sticky"[:sticky_title]+": <strong>" if topic.sticky? %>
     <%= topic_title_link (topic), :class => "entry-title", :rel => "bookmark" %>
-    <%#= link_to h(topic.title), topic_path(@forum, topic), :class => "entry-title", :rel => "bookmark" %>
     <%= "</strong>" if topic.sticky? %>
     <% if topic.paged? -%>
-    <small><%= link_to 'last'[], topic_path(:forum_id => @forum, :id => topic, :page => topic.last_page) %></small>
+    <small><%= link_to 'last'[], forum_topic_path(@forum, topic, :page => topic.last_page) %></small>
     <% end -%>
   </td>
   <td class="ca inv stat"><%= topic.posts.size %></td>
@@ -81,7 +80,7 @@
   <td class="lp">
     <abbr class="updated" title="<%= topic.last_updated_at.xmlschema %>"><%= time_ago_in_words(topic.last_updated_at) %></abbr>
     <%= 'by {user}'[:by_user, "<span class=\"author\"><strong class=\"fn\">#{h(topic.last_user.display_name)}</strong></span>"] %>
-    <span><%= link_to 'view'[], forum_topic_path(:forum_id => @forum, :id => topic, :page => topic.last_page, :anchor => "posts-#{topic.last_post_id}") %></span>
+    <span><%= link_to 'view'[], forum_topic_path(@forum, topic, :page => topic.last_page, :anchor => "posts-#{topic.last_post_id}") %></span>
   </td>
 </tr>
 <% end %>

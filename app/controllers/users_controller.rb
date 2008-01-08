@@ -54,7 +54,7 @@ class UsersController < ApplicationController
   end
   
   def index
-    @users = current_site.users.paginate :all, :page => params[:page]
+    @users = current_site.users.paginate :all, :page => current_page
   end
 
 protected

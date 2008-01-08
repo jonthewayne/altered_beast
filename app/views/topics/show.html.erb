@@ -89,7 +89,7 @@
 
     <%= avatar_for post.user %>
     <span class="fn"><%= link_to truncate(h(post.user.display_name), 15), user_path(post.user), :class => (post.user == @posts.first.user ? "threadauthor" : nil) %></span>
-    <% if post.user.admin? or post.forum.moderators.include?(post.user) %>
+    <% if post.user.admin? || post.forum.moderators.include?(post.user) %>
     <span class="admin">
       <% if post.user.admin? %>
       <%= 'Administator'[:administrator_title] %>
@@ -106,9 +106,9 @@
       <span class="edit">
         <%= ajax_spinner_for "edit-post-#{post.id}", "spinner_bounce.gif" %>
         <%= link_to_remote('Edit post'[], 
-              {:url => edit_post_path(:forum_id => @forum, :topic_id => @topic, :id => post), :method => :get,
+              {:url => edit_forum_topic_post_path(@forum, @topic, post), :method => :get,
                :before => "EditForm.init(#{post.id});", :condition => "!EditForm.isEditing(#{post.id})" }, 
-              {:href => edit_post_path(:forum_id => @forum, :topic_id => @topic, :id => post, :page => params[:page]), :class => "utility"}) %>
+              {:href => edit_forum_topic_post_path(@forum, @topic, post, :page => current_page), :class => "utility"}) %>
       </span>
     </p>
     <% end -%>
@@ -144,7 +144,7 @@
 <div id="reply" class="editbox">
 <div class="container">
   <%= content_tag 'p', h(flash[:bad_reply]), :class => 'notice' if flash[:bad_reply] %>
-  <% form_for :post, :url => posts_path(:forum_id => @forum, :topic_id => @topic, :page => @topic.last_page) do |f| -%>
+  <% form_for :post, :url => forum_topic_posts_path(@forum, @topic, :page => @topic.last_page) do |f| -%>
   <table width="100%" border="0" cellpadding="0" cellspacing="0">
     <tr>
       <td rowspan="2" width="70%">

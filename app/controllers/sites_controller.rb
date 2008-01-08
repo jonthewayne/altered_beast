@@ -2,7 +2,7 @@ class SitesController < ApplicationController
   before_filter :admin_required, :only => [ :destroy, :update, :edit ]
 
   def index
-    @sites = Site.paginate(:all, :page => params[:page], :order => 'host ASC')
+    @sites = Site.paginate(:all, :page => current_page, :order => 'host ASC')
 
     respond_to do |format|
       format.html # index.html.erb
@@ -40,7 +40,7 @@ class SitesController < ApplicationController
         flash[:notice] = 'Site was successfully created.'
         flash[:notice] += ' Please create your account.' unless logged_in?
         format.html do
-          redirect_to logged_in?? @site : signup_url
+          redirect_to logged_in? ? @site : signup_path
         end
         format.xml  { render :xml => @site, :status => :created, :location => @site }
       else
@@ -70,7 +70,7 @@ class SitesController < ApplicationController
     @site.destroy
 
     respond_to do |format|
-      format.html { redirect_to(sites_url) }
+      format.html { redirect_to(sites_path) }
       format.xml  { head :ok }
     end
   end

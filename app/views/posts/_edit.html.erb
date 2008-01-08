@@ -1,6 +1,6 @@
 <div id="edit" class="editbox">
 <div class="container">
-  <% remote_form_for :post, :url => forum_topic_post_path(:forum_id => @post.forum, :topic_id => @post.topic, :id => @post), 
+  <% remote_form_for :post, :url => forum_topic_post_path(@post.forum, @post.topic, @post), 
     :html => { :method => :put }, :before => "$('editbox_spinner').show();" do |f| -%>
 
   <table width="100%" border="0" cellpadding="0" cellspacing="0">
@@ -10,7 +10,7 @@
       </td>
       <td valign="top">
 
-        <%= link_to('delete post'[], forum_topic_post_path(:forum_id => @post.forum, :topic_id => @post.topic, :id => @post, :page => params[:page]), 
+        <%= link_to('delete post'[], forum_topic_post_path(@post.forum, @post.topic, @post, :page => current_page), 
               :class => "utility", :method => :delete, :confirm => "Delete this post?  Are you sure?"[:delete_post_conf]) %>  
 
 

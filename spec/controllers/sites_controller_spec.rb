@@ -13,7 +13,7 @@ describe SitesController, "GET #index" do
 
   before do
     @sites = [sites(:default), sites(:other)]
-    Site.stub!(:paginate).with(:all, :page => params[:page], :order => 'host ASC').and_return(@sites)
+    Site.stub!(:paginate).with(:all, :page => 1, :order => 'host ASC').and_return(@sites)
     @controller.stub!(:admin_required).and_return(true)
     @controller.stub!(:require_site)
   end

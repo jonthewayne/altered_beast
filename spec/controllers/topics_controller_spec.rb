@@ -6,7 +6,7 @@ describe TopicsController, "GET #index" do
   act! { get :index, :forum_id => 1 }
   
   it.assigns :topics => :nil, :forum => :nil
-  it.redirects_to { forum_path('1') }
+  it.redirects_to { forum_path(@forum) }
 
   describe TopicsController, "(xml)" do
     define_models :stubbed
@@ -15,10 +15,10 @@ describe TopicsController, "GET #index" do
 
     before do
       @forum  = forums(:default)
-      Forum.stub!(:find).with('1').and_return(@forum)
+      Forum.stub!(:find_by_permalink).with('1').and_return(@forum)
       @topics = []
       @forum.stub!(:topics).and_return([])
-      @forum.topics.stub!(:paginate).with(:page => '5').and_return(@topics)
+      @forum.topics.stub!(:paginate).with(:page => 5).and_return(@topics)
     end
 
     it.assigns :topics, :forum
@@ -33,14 +33,14 @@ describe TopicsController, "GET #show" do
 
   before do
     @forum  = forums(:default)
-    Forum.stub!(:find).with('1').and_return(@forum)
+    Forum.stub!(:find_by_permalink).with('1').and_return(@forum)
     @posts = []
     @topic  = topics(:default)
     @topic.stub!(:hit!)
     @forum.stub!(:topics).and_return([])
     @topic.stub!(:posts).and_return([])
-    @topic.posts.stub!(:paginate).with(:page => '5').and_return(@posts)
-    @forum.topics.stub!(:find).with('1').and_return(@topic)
+    @topic.posts.stub!(:paginate).with(:page => 5).and_return(@posts)
+    @forum.topics.stub!(:find_by_permalink).with('1').and_return(@topic)
   end
   
   it.assigns :topic, :forum, :posts, :session => {:topics => nil}
@@ -105,7 +105,7 @@ describe TopicsController, "GET #new" do
   act! { get :new, :forum_id => 1 }
   before do
     @forum  = forums(:default)
-    Forum.stub!(:find).with('1').and_return(@forum)
+    Forum.stub!(:find_by_permalink).with('1').and_return(@forum)
     @topic  = Topic.new
   end
 
@@ -132,10 +132,10 @@ describe TopicsController, "GET #edit" do
   
   before do
     @forum  = forums(:default)
-    Forum.stub!(:find).with('1').and_return(@forum)
+    Forum.stub!(:find_by_permalink).with('1').and_return(@forum)
     @forum.stub!(:topics).and_return([])
     @topic  = topics(:default)
-    @forum.topics.stub!(:find).with('1').and_return(@topic)
+    @forum.topics.stub!(:find_by_permalink).with('1').and_return(@topic)
   end
 
   it.assigns :topic, :forum
@@ -145,7 +145,7 @@ end
 describe TopicsController, "POST #create" do
   before do
     @forum  = forums(:default)
-    Forum.stub!(:find).with('1').and_return(@forum)
+    Forum.stub!(:find_by_permalink).with('1').and_return(@forum)
     @forum.stub!(:topics).and_return([])
     @attributes = {}
     @topic = mock_model Topic, :new_record? => false, :errors => []
@@ -205,11 +205,11 @@ end
 describe TopicsController, "PUT #update" do
   before do
     @forum  = forums(:default)
-    Forum.stub!(:find).with('1').and_return(@forum)
+    Forum.stub!(:find_by_permalink).with('1').and_return(@forum)
     @attributes = {}
     @topic = topics(:default)
     @forum.stub!(:topics).and_return([])
-    @forum.topics.stub!(:find).with('1').and_return(@topic)
+    @forum.topics.stub!(:find_by_permalink).with('1').and_return(@topic)
   end
   
   describe TopicsController, "(successful save)" do
@@ -267,11 +267,11 @@ describe TopicsController, "DELETE #destroy" do
   
   before do
     @forum  = forums(:default)
-    Forum.stub!(:find).with('1').and_return(@forum)
+    Forum.stub!(:find_by_permalink).with('1').and_return(@forum)
     @forum.stub!(:topics).and_return([])
     @topic = topics(:default)
     @topic.stub!(:destroy)
-    @forum.topics.stub!(:find).with('1').and_return(@topic)
+    @forum.topics.stub!(:find_by_permalink).with('1').and_return(@topic)
   end
 
   it.assigns :topic

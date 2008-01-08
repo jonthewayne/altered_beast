@@ -13,6 +13,8 @@ class User < ActiveRecord::Base
   has_many :monitorships, :dependent => :delete_all
   has_many :monitored_topics, :through => :monitorships, :source => :topic, :conditions => {"#{Monitorship.table_name}.active" => true}
   
+  has_permalink :login
+  
   attr_readonly :posts_count, :last_seen_at
 
   def self.prefetch_from(records)
@@ -45,5 +47,9 @@ class User < ActiveRecord::Base
     now = Time.now.utc
     self.class.update_all ['last_seen_at = ?', now], ['id = ?', id]
     write_attribute :last_seen_at, now
+  end
+  
+  def to_param
+    permalink
   end
 end

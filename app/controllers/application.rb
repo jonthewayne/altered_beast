@@ -3,6 +3,7 @@
 class ApplicationController < ActionController::Base
   include AuthenticatedSystem
   helper :all
+  helper_method :current_page
   
   # See ActionController::RequestForgeryProtection for details
   # Uncomment the :secret if you're not using the cookie session store
@@ -11,5 +12,9 @@ class ApplicationController < ActionController::Base
   # raised in #current_site
   rescue_from Site::UndefinedError do |e|
     redirect_to new_site_path
+  end
+  
+  def current_page
+    @page ||= params[:page].blank? ? 1 : params[:page].to_i
   end
 end

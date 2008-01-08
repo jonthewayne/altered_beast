@@ -5,6 +5,8 @@ class Forum < ActiveRecord::Base
   
   belongs_to :site
   
+  has_permalink :name
+  
   attr_readonly :posts_count, :topics_count
 
   has_many :topics, :order => "#{Topic.table_name}.sticky desc, #{Topic.table_name}.last_updated_at desc", :dependent => :delete_all
@@ -23,5 +25,9 @@ class Forum < ActiveRecord::Base
   # retrieves forums ordered by position
   def self.find_ordered(options = {})
     find :all, options.update(:order => 'position')
+  end
+  
+  def to_param
+    permalink
   end
 end

@@ -18,13 +18,13 @@ class ForumsController < ApplicationController
   # GET /forums/1
   # GET /forums/1.xml
   def show
-    @forum = current_site.forums.find(params[:id])
+    @forum = current_site.forums.find_by_permalink(params[:id])
     (session[:forums] ||= {})[@forum.id] = Time.now.utc
-    (session[:forums_page] ||= Hash.new(1))[@forum.id] = params[:page].to_i if params[:page]
+    (session[:forums_page] ||= Hash.new(1))[@forum.id] = current_page if current_page > 1
 
     respond_to do |format|
       format.html do # show.html.erb
-        @topics = @forum.topics.paginate :page => params[:page]
+        @topics = @forum.topics.paginate :page => current_page
       end
       format.xml  { render :xml => @forum }
     end
@@ -43,7 +43,7 @@ class ForumsController < ApplicationController
 
   # GET /forums/1/edit
   def edit
-    @forum = current_site.forums.find(params[:id])
+    @forum = current_site.forums.find_by_permalink(params[:id])
   end
 
   # POST /forums
@@ -66,7 +66,7 @@ class ForumsController < ApplicationController
   # PUT /forums/1
   # PUT /forums/1.xml
   def update
-    @forum = current_site.forums.find(params[:id])
+    @forum = current_site.forums.find_by_permalink(params[:id])
 
     respond_to do |format|
       if @forum.update_attributes(params[:forum])
@@ -83,11 +83,11 @@ class ForumsController < ApplicationController
   # DELETE /forums/1
   # DELETE /forums/1.xml
   def destroy
-    @forum = current_site.forums.find(params[:id])
+    @forum = current_site.forums.find_by_permalink(params[:id])
     @forum.destroy
 
     respond_to do |format|
-      format.html { redirect_to(forums_url) }
+      format.html { redirect_to(forums_path) }
       format.xml  { head :ok }
     end
   end
