@@ -1,4 +1,6 @@
 class Topic < ActiveRecord::Base
+  include User::Editable
+
   before_validation_on_create :set_default_attributes
   after_create   :create_initial_post
   before_update  :check_for_moved_forum
@@ -56,10 +58,6 @@ class Topic < ActiveRecord::Base
       post.user  = user
       post.save
     end
-  end
-  
-  def editable_by?(user)
-    true
   end
 
   def sticky?

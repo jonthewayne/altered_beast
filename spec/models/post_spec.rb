@@ -71,15 +71,15 @@ describe Post, "#editable_by?" do
     @post  = Post.new
   end
 
-  it "allows user" do
+  it "restricts user for other post" do
     @user.should_receive(:admin?).and_return(false)
     @user.should_receive(:moderator_of?).and_return(false)
     @post.should_not be_editable_by(@user)
   end
 
-  it "restricts user for other post" do
+  it "allows user" do
     @post.user_id = @user.id
-    @post.should     be_editable_by(@user)
+    @post.should be_editable_by(@user)
   end
   
   it "allows admin" do

@@ -1,4 +1,6 @@
 class Post < ActiveRecord::Base
+  include User::Editable
+
   # author of post
   belongs_to :user, :counter_cache => true
   
@@ -17,10 +19,6 @@ class Post < ActiveRecord::Base
   after_destroy :update_cached_fields
 
   attr_accessible :body
-
-  def editable_by?(user)
-    user && (user.id == user_id || user.admin? || user.moderator_of?(forum_id))
-  end
 
 protected
   def update_cached_fields
