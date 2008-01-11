@@ -7,11 +7,10 @@ describe Forum do
     end
   end
 
-  it "formats body html" do
-    pending "no sanitization yet"
+  it "formats description html" do
     f = Forum.new :description => 'bar'
     f.description_html.should be_nil
-    f.send :format_content
+    f.send :format_attributes
     f.description_html.should == 'bar'
   end
   

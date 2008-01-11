@@ -13,6 +13,13 @@ describe Post do
     p.should_not be_valid
     p.errors.on(:body).should_not be_nil
   end
+
+  it "formats body html" do
+    p = Post.new :body => 'bar'
+    p.body_html.should be_nil
+    p.send :format_attributes
+    p.body_html.should == 'bar'
+  end
 end
 
 describe Post, "being deleted" do

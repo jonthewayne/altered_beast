@@ -1,5 +1,7 @@
 class Post < ActiveRecord::Base
   include User::Editable
+  
+  formats_attributes :body
 
   # author of post
   belongs_to :user, :counter_cache => true

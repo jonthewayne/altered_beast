@@ -1,6 +1,8 @@
 class User < ActiveRecord::Base
   concerned_with :validation, :states, :activation
 
+  formats_attributes :bio
+
   belongs_to :site, :counter_cache => true
   validates_presence_of :site_id
   
