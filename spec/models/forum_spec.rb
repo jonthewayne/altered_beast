@@ -11,7 +11,7 @@ describe Forum do
     f = Forum.new :description => 'bar'
     f.description_html.should be_nil
     f.send :format_attributes
-    f.description_html.should == 'bar'
+    f.description_html.should == '<p>bar</p>'
   end
   
   it "lists topics with sticky topics first" do

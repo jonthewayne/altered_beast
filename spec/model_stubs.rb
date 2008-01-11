@@ -30,7 +30,9 @@ ModelStubbing.define_models do
     stub :other_forum, :forum => all_stubs(:other_forum), :topic => all_stubs(:other_forum_topic)
   end
   
-  model Moderatorship
+  model Moderatorship do
+    stub :user => all_stubs(:user), :forum => all_stubs(:other_forum)
+  end
   model Monitorship
 end
 

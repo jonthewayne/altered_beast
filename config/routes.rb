@@ -1,5 +1,5 @@
 ActionController::Routing::Routes.draw do |map|
-  map.resources :sites
+  map.resources :sites, :moderatorships
 
   map.resources :forums, :has_many => :posts do |forum|
     forum.resources :topics do |topic|

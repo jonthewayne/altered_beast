@@ -35,7 +35,7 @@ describe User do
     u = User.new :bio => 'foo'
     u.bio_html.should be_nil
     u.send :format_attributes
-    u.bio_html.should == 'foo'
+    u.bio_html.should == '<p>foo</p>'
   end
   
   it "sets User#display_name from login if nil" do

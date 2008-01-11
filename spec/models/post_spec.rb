@@ -18,7 +18,7 @@ describe Post do
     p = Post.new :body => 'bar'
     p.body_html.should be_nil
     p.send :format_attributes
-    p.body_html.should == 'bar'
+    p.body_html.should == '<p>bar</p>'
   end
 end
 
