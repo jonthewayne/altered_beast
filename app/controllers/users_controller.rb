@@ -1,7 +1,7 @@
 class UsersController < ApplicationController
   # Protect these actions behind an admin login
   # before_filter :admin_required, :only => [:suspend, :unsuspend, :destroy, :purge]
-  before_filter :find_user, :only => [:suspend, :unsuspend, :destroy, :purge]
+  before_filter :find_user, :only => [:show, :suspend, :unsuspend, :destroy, :purge]
   
 
   # render new.rhtml
@@ -55,7 +55,7 @@ class UsersController < ApplicationController
 
 protected
   def find_user
-    @user = current_site.users.find(params[:id])
+    @user = current_site.users.find_by_permalink(params[:id])
   end
 
 end

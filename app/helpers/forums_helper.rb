@@ -19,6 +19,10 @@ module ForumsHelper
     pluralize current_site.posts.size, 'post'
   end
   
+  def last_active
+    session[:last_active] ||= Time.now.utc
+  end
+  
   # Ripe for optimization
   def voice_count
     pluralize current_site.topics.to_a.sum { |t| t.voice_count }, 'voice'
