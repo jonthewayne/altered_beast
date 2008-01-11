@@ -5,8 +5,8 @@ describe TopicsController, "GET #index" do
 
   act! { get :index, :forum_id => 1 }
   
-  it.assigns :topics => :nil, :forum => :nil
-  it.redirects_to { forum_path(@forum) }
+  it_assigns :topics => :nil, :forum => :nil
+  it_redirects_to { forum_path(@forum) }
 
   describe TopicsController, "(xml)" do
     define_models :stubbed
@@ -21,8 +21,8 @@ describe TopicsController, "GET #index" do
       @forum.topics.stub!(:paginate).with(:page => 5).and_return(@topics)
     end
 
-    it.assigns :topics, :forum
-    it.renders :xml, :topics
+    it_assigns :topics, :forum
+    it_renders :xml, :topics
   end
 end
 
@@ -43,8 +43,8 @@ describe TopicsController, "GET #show" do
     @forum.topics.stub!(:find_by_permalink).with('1').and_return(@topic)
   end
   
-  it.assigns :topic, :forum, :posts, :session => {:topics => nil}
-  it.renders :template, :show
+  it_assigns :topic, :forum, :posts, :session => {:topics => nil}
+  it_renders :template, :show
   
   it "should render atom feed" do
     pending "no atom support yet"
@@ -70,7 +70,7 @@ describe TopicsController, "GET #show" do
       controller.current_user.stub!(:seen!)
     end
 
-    it.assigns :topic, :forum, :session => {:topics => :not_nil}
+    it_assigns :topic, :forum, :session => {:topics => :not_nil}
   
     it "increments topic hit count" do
       @topic.user_id = 5
@@ -94,9 +94,9 @@ describe TopicsController, "GET #show" do
     
     act! { get :show, :forum_id => 1, :id => 1, :format => 'xml' }
 
-    it.assigns :topic, :post => nil, :posts => nil
+    it_assigns :topic, :post => nil, :posts => nil
 
-    it.renders :xml, :topic
+    it_renders :xml, :topic
   end
 end
 
@@ -109,20 +109,20 @@ describe TopicsController, "GET #new" do
     @topic  = Topic.new
   end
 
-  it.assigns :forum
+  it_assigns :forum
 
   it "assigns @topic" do
     act!
     assigns[:topic].should be_new_record
   end
   
-  it.renders :template, :new
+  it_renders :template, :new
   
   describe TopicsController, "(xml)" do
     define_models :stubbed
     act! { get :new, :forum_id => 1, :format => 'xml' }
 
-    it.renders :xml, :topic
+    it_renders :xml, :topic
   end
 end
 
@@ -138,8 +138,8 @@ describe TopicsController, "GET #edit" do
     @forum.topics.stub!(:find_by_permalink).with('1').and_return(@topic)
   end
 
-  it.assigns :topic, :forum
-  it.renders :template, :edit
+  it_assigns :topic, :forum
+  it_renders :template, :edit
 end
 
 describe TopicsController, "POST #create" do
@@ -160,8 +160,8 @@ describe TopicsController, "POST #create" do
       @topic.stub!(:new_record?).and_return(false)
     end
     
-    it.assigns :topic, :flash => { :notice => :not_nil }
-    it.redirects_to { forum_topic_path(@forum, @topic) }
+    it_assigns :topic, :flash => { :notice => :not_nil }
+    it_redirects_to { forum_topic_path(@forum, @topic) }
   end
 
   describe TopicsController, "(unsuccessful creation)" do
@@ -172,8 +172,8 @@ describe TopicsController, "POST #create" do
       @topic.stub!(:new_record?).and_return(true)
     end
     
-    it.assigns :topic
-    it.renders :template, :new
+    it_assigns :topic
+    it_renders :template, :new
   end
   
   describe TopicsController, "(successful creation, xml)" do
@@ -185,8 +185,8 @@ describe TopicsController, "POST #create" do
       @topic.stub!(:to_xml).and_return("mocked content")
     end
     
-    it.assigns :topic, :headers => { :Location => lambda { forum_topic_url(@forum, @topic) } }
-    it.renders :xml, :topic, :status => :created
+    it_assigns :topic, :headers => { :Location => lambda { forum_topic_url(@forum, @topic) } }
+    it_renders :xml, :topic, :status => :created
   end
   
   describe TopicsController, "(unsuccessful creation, xml)" do
@@ -197,8 +197,8 @@ describe TopicsController, "POST #create" do
       @topic.stub!(:new_record?).and_return(true)
     end
     
-    it.assigns :topic
-    it.renders :xml, "topic.errors", :status => :unprocessable_entity
+    it_assigns :topic
+    it_renders :xml, "topic.errors", :status => :unprocessable_entity
   end
 end
 
@@ -220,8 +220,8 @@ describe TopicsController, "PUT #update" do
       @topic.stub!(:save).and_return(true)
     end
     
-    it.assigns :topic, :flash => { :notice => :not_nil }
-    it.redirects_to { forum_topic_path(@forum, @topic) }
+    it_assigns :topic, :flash => { :notice => :not_nil }
+    it_redirects_to { forum_topic_path(@forum, @topic) }
   end
 
   describe TopicsController, "(unsuccessful save)" do
@@ -232,8 +232,8 @@ describe TopicsController, "PUT #update" do
       @topic.stub!(:save).and_return(false)
     end
     
-    it.assigns :topic
-    it.renders :template, :edit
+    it_assigns :topic
+    it_renders :template, :edit
   end
   
   describe TopicsController, "(successful save, xml)" do
@@ -244,8 +244,8 @@ describe TopicsController, "PUT #update" do
       @topic.stub!(:save).and_return(true)
     end
     
-    it.assigns :topic
-    it.renders :blank
+    it_assigns :topic
+    it_renders :blank
   end
   
   describe TopicsController, "(unsuccessful save, xml)" do
@@ -256,8 +256,8 @@ describe TopicsController, "PUT #update" do
       @topic.stub!(:save).and_return(false)
     end
     
-    it.assigns :topic
-    it.renders :xml, "topic.errors", :status => :unprocessable_entity
+    it_assigns :topic
+    it_renders :xml, "topic.errors", :status => :unprocessable_entity
   end
 end
 
@@ -274,14 +274,14 @@ describe TopicsController, "DELETE #destroy" do
     @forum.topics.stub!(:find_by_permalink).with('1').and_return(@topic)
   end
 
-  it.assigns :topic
-  it.redirects_to { forum_path(@forum) }
+  it_assigns :topic
+  it_redirects_to { forum_path(@forum) }
   
   describe TopicsController, "(xml)" do
     define_models :stubbed
     act! { delete :destroy, :forum_id => 1, :id => 1, :format => 'xml' }
 
-    it.assigns :topic
-    it.renders :blank
+    it_assigns :topic
+    it_renders :blank
   end
 end

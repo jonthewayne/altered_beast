@@ -24,16 +24,16 @@ describe PostsController, "GET #index" do
 
   act! { get :index, :forum_id => 1, :topic_id => 1, :user => nil, :q => 'foo', :page => 5 }
   
-  it.assigns :posts, :forum, :topic, :parent => lambda { @topic }
-  it.renders :template, :index
+  it_assigns :posts, :forum, :topic, :parent => lambda { @topic }
+  it_renders :template, :index
 
   describe PostsController, "(xml)" do
     define_models :stubbed
     
     act! { get :index, :forum_id => 1, :topic_id => 1, :user => nil, :q => 'foo', :page => 5, :format => 'xml' }
 
-    it.assigns :posts, :forum, :topic, :parent => lambda { @topic }
-    it.renders :xml, :posts
+    it_assigns :posts, :forum, :topic, :parent => lambda { @topic }
+    it_renders :xml, :posts
   end
 end
 
@@ -51,16 +51,16 @@ describe PostsController, "GET #index (for forums)" do
     User.stub!(:index_from).and_return({users(:default).id => users(:default)})
   end
 
-  it.assigns :posts, :forum, :topic => nil, :user => nil, :parent => lambda { @forum }
-  it.renders :template, :index
+  it_assigns :posts, :forum, :topic => nil, :user => nil, :parent => lambda { @forum }
+  it_renders :template, :index
 
   describe PostsController, "(xml)" do
     define_models :stubbed
     
     act! { get :index, :forum_id => 1, :page => 5, :q => 'foo', :format => 'xml' }
 
-    it.assigns :posts, :forum, :topic => nil, :user => nil, :parent => lambda { @forum }
-    it.renders :xml, :posts
+    it_assigns :posts, :forum, :topic => nil, :user => nil, :parent => lambda { @forum }
+    it_renders :xml, :posts
   end
 end
 
@@ -78,16 +78,16 @@ describe PostsController, "GET #index (for users)" do
     User.stub!(:index_from).and_return { raise("Nooooo") }
   end
 
-  it.assigns :posts, :user, :forum => nil, :topic => nil, :parent => lambda { @user }
-  it.renders :template, :index
+  it_assigns :posts, :user, :forum => nil, :topic => nil, :parent => lambda { @user }
+  it_renders :template, :index
 
   describe PostsController, "(xml)" do
     define_models :stubbed
     
     act! { get :index, :user_id => 1, :page => 5, :q => 'foo', :format => 'xml' }
 
-    it.assigns :posts, :user, :forum => nil, :topic => nil, :parent => lambda { @user }
-    it.renders :xml, :posts
+    it_assigns :posts, :user, :forum => nil, :topic => nil, :parent => lambda { @user }
+    it_renders :xml, :posts
   end
 end
 
@@ -102,16 +102,16 @@ describe PostsController, "GET #index (globally)" do
     User.stub!(:index_from).and_return({users(:default).id => users(:default)})
   end
 
-  it.assigns :posts, :user => nil, :forum => nil, :topic => nil, :parent => nil
-  it.renders :template, :index
+  it_assigns :posts, :user => nil, :forum => nil, :topic => nil, :parent => nil
+  it_renders :template, :index
 
   describe PostsController, "(xml)" do
     define_models :stubbed
     
     act! { get :index, :page => 5, :q => 'foo', :format => 'xml' }
 
-    it.assigns :posts, :user => nil, :forum => nil, :topic => nil, :parent => nil
-    it.renders :xml, :posts
+    it_assigns :posts, :user => nil, :forum => nil, :topic => nil, :parent => nil
+    it_renders :xml, :posts
   end
 end
 
@@ -121,17 +121,17 @@ describe PostsController, "GET #show" do
 
   act! { get :show, :forum_id => 1, :topic_id => 1, :id => 1 }
   
-  it.assigns :forum, :topic, :parent => lambda { @topic }, :post => nil
-  it.redirects_to { forum_topic_path(@forum, @topic) }
+  it_assigns :forum, :topic, :parent => lambda { @topic }, :post => nil
+  it_redirects_to { forum_topic_path(@forum, @topic) }
   
   describe PostsController, "(xml)" do
     define_models :stubbed
     
-    it.assigns :post, :forum, :topic, :parent => lambda { @topic }
+    it_assigns :post, :forum, :topic, :parent => lambda { @topic }
 
     act! { get :show, :forum_id => 1, :topic_id => 1, :id => 1, :format => 'xml' }
 
-    it.renders :xml, :post
+    it_renders :xml, :post
   end
 end
 
@@ -143,20 +143,20 @@ describe PostsController, "GET #new" do
     @post  = Post.new
   end
 
-  it.assigns :forum, :topic, :parent => lambda { @topic }
+  it_assigns :forum, :topic, :parent => lambda { @topic }
 
   it "assigns @post" do
     act!
     assigns[:post].should be_new_record
   end
   
-  it.renders :template, :new
+  it_renders :template, :new
   
   describe PostsController, "(xml)" do
     define_models :stubbed
     act! { get :new, :forum_id => 1, :topic_id => 1, :format => 'xml' }
-    it.assigns :forum, :topic, :parent => lambda { @topic }
-    it.renders :xml, :post
+    it_assigns :forum, :topic, :parent => lambda { @topic }
+    it_renders :xml, :post
   end
 end
 
@@ -165,8 +165,8 @@ describe PostsController, "GET #edit" do
   define_models :stubbed
   act! { get :edit, :forum_id => 1, :topic_id => 1, :id => 1 }
 
-  it.assigns :post, :forum, :topic, :parent => lambda { @topic }
-  it.renders :template, :edit
+  it_assigns :post, :forum, :topic, :parent => lambda { @topic }
+  it_renders :template, :edit
 end
 
 describe PostsController, "POST #create" do
@@ -185,8 +185,8 @@ describe PostsController, "POST #create" do
       @post.stub!(:new_record?).and_return(false)
     end
     
-    it.assigns :post, :forum, :topic, :parent => lambda { @topic }, :flash => { :notice => :not_nil }
-    it.redirects_to { forum_topic_post_path(@forum, @topic, @post) }
+    it_assigns :post, :forum, :topic, :parent => lambda { @topic }, :flash => { :notice => :not_nil }
+    it_redirects_to { forum_topic_post_path(@forum, @topic, @post) }
   end
 
   describe PostsController, "(unsuccessful creation)" do
@@ -197,8 +197,8 @@ describe PostsController, "POST #create" do
       @post.stub!(:new_record?).and_return(true)
     end
     
-    it.assigns :post, :forum, :topic, :parent => lambda { @topic }
-    it.renders :template, :new
+    it_assigns :post, :forum, :topic, :parent => lambda { @topic }
+    it_renders :template, :new
   end
   
   describe PostsController, "(successful creation, xml)" do
@@ -210,8 +210,8 @@ describe PostsController, "POST #create" do
       @post.stub!(:to_xml).and_return("mocked content")
     end
     
-    it.assigns :post, :forum, :topic, :parent => lambda { @topic }, :headers => { :Location => lambda { forum_topic_post_url(@forum, @topic, @post) } }
-    it.renders :xml, :post, :status => :created
+    it_assigns :post, :forum, :topic, :parent => lambda { @topic }, :headers => { :Location => lambda { forum_topic_post_url(@forum, @topic, @post) } }
+    it_renders :xml, :post, :status => :created
   end
   
   describe PostsController, "(unsuccessful creation, xml)" do
@@ -222,8 +222,8 @@ describe PostsController, "POST #create" do
       @post.stub!(:new_record?).and_return(true)
     end
     
-    it.assigns :post, :forum, :topic, :parent => lambda { @topic }
-    it.renders :xml, "post.errors", :status => :unprocessable_entity
+    it_assigns :post, :forum, :topic, :parent => lambda { @topic }
+    it_renders :xml, "post.errors", :status => :unprocessable_entity
   end
 end
 
@@ -243,8 +243,8 @@ describe PostsController, "PUT #update" do
       @post.stub!(:update_attributes).and_return(true)
     end
     
-    it.assigns :post, :forum, :topic, :parent => lambda { @topic }, :flash => { :notice => :not_nil }
-    it.redirects_to { forum_topic_path(@forum, @topic) }
+    it_assigns :post, :forum, :topic, :parent => lambda { @topic }, :flash => { :notice => :not_nil }
+    it_redirects_to { forum_topic_path(@forum, @topic) }
   end
 
   describe PostsController, "(unsuccessful save)" do
@@ -255,8 +255,8 @@ describe PostsController, "PUT #update" do
       @post.stub!(:update_attributes).and_return(false)
     end
     
-    it.assigns :post, :forum, :topic, :parent => lambda { @topic }
-    it.renders :template, :edit
+    it_assigns :post, :forum, :topic, :parent => lambda { @topic }
+    it_renders :template, :edit
   end
   
   describe PostsController, "(successful save, xml)" do
@@ -267,8 +267,8 @@ describe PostsController, "PUT #update" do
       @post.stub!(:update_attributes).and_return(true)
     end
     
-    it.assigns :post
-    it.renders :blank
+    it_assigns :post
+    it_renders :blank
   end
   
   describe PostsController, "(unsuccessful save, xml)" do
@@ -279,8 +279,8 @@ describe PostsController, "PUT #update" do
       @post.stub!(:update_attributes).and_return(false)
     end
     
-    it.assigns :post, :forum, :topic, :parent => lambda { @topic }
-    it.renders :xml, "post.errors", :status => :unprocessable_entity
+    it_assigns :post, :forum, :topic, :parent => lambda { @topic }
+    it_renders :xml, "post.errors", :status => :unprocessable_entity
   end
 end
 
@@ -293,14 +293,14 @@ describe PostsController, "DELETE #destroy" do
     @post.stub!(:destroy)
   end
 
-  it.assigns :post, :forum, :topic, :parent => lambda { @topic }
-  it.redirects_to { forum_topic_path(@forum, @topic) }
+  it_assigns :post, :forum, :topic, :parent => lambda { @topic }
+  it_redirects_to { forum_topic_path(@forum, @topic) }
   
   describe PostsController, "(xml)" do
     define_models :stubbed
     act! { delete :destroy, :forum_id => 1, :topic_id => 1, :id => 1, :format => 'xml' }
 
-    it.assigns :post
-    it.renders :blank
+    it_assigns :post
+    it_renders :blank
   end
 end

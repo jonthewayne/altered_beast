@@ -15,16 +15,16 @@ describe ForumsController, "GET #index" do
     @forum_time = session[:forums] = {1 => 5.minutes.ago.utc}
   end
   
-  it.assigns :forums, :session => {:forums_page => nil, :forums => lambda { @forum_time }}
-  it.renders :template, :index
+  it_assigns :forums, :session => {:forums_page => nil, :forums => lambda { @forum_time }}
+  it_renders :template, :index
   
   describe ForumsController, "(xml)" do
     define_models :stubbed
     
     act! { get :index, :format => 'xml' }
 
-    it.assigns :forums
-    it.renders :xml, :forums
+    it_assigns :forums
+    it_renders :xml, :forums
   end
 end
 
@@ -46,8 +46,8 @@ describe ForumsController, "GET #show" do
     @forum_time = session[:forums]      = {@forum.id => Time.utc(2007, 1, 1)}
   end
   
-  it.assigns :topics, :forum, :session => {:forums_page => lambda { @forum_page }, :forums => lambda { @forum_time }}
-  it.renders :template, :show
+  it_assigns :topics, :forum, :session => {:forums_page => lambda { @forum_page }, :forums => lambda { @forum_time }}
+  it_renders :template, :show
   
   it "sets session[:forums] if logged in" do
     @controller.stub!(:logged_in?).and_return(true)
@@ -62,7 +62,7 @@ describe ForumsController, "GET #show" do
       @forum.topics.stub!(:paginate).with(:page => 5).and_return(@topics)
     end
     
-    it.assigns :session => { :forums_page => lambda { {@forum.id => 5} } }
+    it_assigns :session => { :forums_page => lambda { {@forum.id => 5} } }
   end
   
   describe ForumsController, "(xml)" do
@@ -70,8 +70,8 @@ describe ForumsController, "GET #show" do
     
     act! { get :show, :id => 1, :format => 'xml' }
 
-    it.assigns :topics => :undefined
-    it.renders :xml, :forum
+    it_assigns :topics => :undefined
+    it_renders :xml, :forum
   end
 end
 
@@ -90,13 +90,13 @@ describe ForumsController, "GET #new" do
     assigns[:forum].should be_new_record
   end
   
-  it.renders :template, :new
+  it_renders :template, :new
   
   describe ForumsController, "(xml)" do
     define_models :stubbed
     act! { get :new, :format => 'xml' }
 
-    it.renders :xml, :forum
+    it_renders :xml, :forum
   end
 end
 
@@ -112,8 +112,8 @@ describe ForumsController, "GET #edit" do
     @controller.stub!(:admin_required).and_return(true)
   end
 
-  it.assigns :forum
-  it.renders :template, :edit
+  it_assigns :forum
+  it_renders :template, :edit
 end
 
 describe ForumsController, "POST #create" do
@@ -134,8 +134,8 @@ describe ForumsController, "POST #create" do
       @forum.stub!(:save).and_return(true)
     end
     
-    it.assigns :forum, :flash => { :notice => :not_nil }
-    it.redirects_to { forum_path(@forum) }
+    it_assigns :forum, :flash => { :notice => :not_nil }
+    it_redirects_to { forum_path(@forum) }
   end
   
   describe ForumsController, "(successful creation, xml)" do
@@ -147,8 +147,8 @@ describe ForumsController, "POST #create" do
       @forum.stub!(:to_xml).and_return("<forum />")
     end
     
-    it.assigns :forum, :headers => { :Location => lambda { forum_url(@forum) } }
-    it.renders :xml, :forum, :status => :created
+    it_assigns :forum, :headers => { :Location => lambda { forum_url(@forum) } }
+    it_renders :xml, :forum, :status => :created
   end
 
   describe ForumsController, "(unsuccessful creation)" do
@@ -159,8 +159,8 @@ describe ForumsController, "POST #create" do
       @forum.stub!(:save).and_return(false)
     end
     
-    it.assigns :forum
-    it.renders :template, :new
+    it_assigns :forum
+    it_renders :template, :new
   end
   
   describe ForumsController, "(unsuccessful creation, xml)" do
@@ -171,8 +171,8 @@ describe ForumsController, "POST #create" do
       @forum.stub!(:save).and_return(false)
     end
     
-    it.assigns :forum
-    it.renders :xml, "forum.errors", :status => :unprocessable_entity
+    it_assigns :forum
+    it_renders :xml, "forum.errors", :status => :unprocessable_entity
   end
 end
 
@@ -194,8 +194,8 @@ describe ForumsController, "PUT #update" do
       @forum.stub!(:save).and_return(true)
     end
     
-    it.assigns :forum, :flash => { :notice => :not_nil }
-    it.redirects_to { forum_path(@forum) }
+    it_assigns :forum, :flash => { :notice => :not_nil }
+    it_redirects_to { forum_path(@forum) }
   end
   
   describe ForumsController, "(successful save, xml)" do
@@ -206,8 +206,8 @@ describe ForumsController, "PUT #update" do
       @forum.stub!(:save).and_return(true)
     end
     
-    it.assigns :forum
-    it.renders :blank
+    it_assigns :forum
+    it_renders :blank
   end
 
   describe ForumsController, "(unsuccessful save)" do
@@ -218,8 +218,8 @@ describe ForumsController, "PUT #update" do
       @forum.stub!(:save).and_return(false)
     end
     
-    it.assigns :forum
-    it.renders :template, :edit
+    it_assigns :forum
+    it_renders :template, :edit
   end
   
   describe ForumsController, "(unsuccessful save, xml)" do
@@ -230,8 +230,8 @@ describe ForumsController, "PUT #update" do
       @forum.stub!(:save).and_return(false)
     end
     
-    it.assigns :forum
-    it.renders :xml, "forum.errors", :status => :unprocessable_entity
+    it_assigns :forum
+    it_renders :xml, "forum.errors", :status => :unprocessable_entity
   end
 end
 
@@ -248,14 +248,14 @@ describe ForumsController, "DELETE #destroy" do
     @controller.stub!(:admin_required).and_return(true)
   end
 
-  it.assigns :forum
-  it.redirects_to { forums_path }
+  it_assigns :forum
+  it_redirects_to { forums_path }
   
   describe ForumsController, "(xml)" do
     define_models :stubbed
     act! { delete :destroy, :id => 1, :format => 'xml' }
 
-    it.assigns :forum
-    it.renders :blank
+    it_assigns :forum
+    it_renders :blank
   end
 end

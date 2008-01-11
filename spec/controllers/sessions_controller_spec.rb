@@ -12,9 +12,9 @@ describe SessionsController, "POST /create" do
   
   act! { post :create, @login[:options].merge(:login => users(@login[:user]).login, :password => @login[:pass]) }
 
-  it.assigns :flash => {:notice => :not_nil},
+  it_assigns :flash => {:notice => :not_nil},
     :session => {:user => :not_nil}
-  it.redirects_to { '/' }
+  it_redirects_to { '/' }
   
   it 'fails login and does not redirect' do
     attempt_login 'bad password'
@@ -47,16 +47,14 @@ describe SessionsController, "POST /create" do
   end
 end
 
-
-
 describe SessionsController, "DELETE /destroy" do
   define_models
 
   before { login_as :default }
   act! { get :destroy }
   
-  it.assigns :session => {:user => nil}
-  it.redirects_to { '/' }
+  it_assigns :session => {:user => nil}
+  it_redirects_to { '/' }
 
   it 'deletes token on logout' do
     acting.cookies["auth_token"].should == []

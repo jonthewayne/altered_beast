@@ -1,3 +1,0 @@
-[submodule "vendor/plugins/rspec_on_rails_on_crack"]
-	path = vendor/plugins/rspec_on_rails_on_crack
-	url = git@activereload.net:rspec_on_rails_on_crack.git
