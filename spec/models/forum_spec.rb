@@ -31,6 +31,6 @@ describe Forum do
   end
   
   it "finds ordered forums" do
-    Forum.find_ordered.should == [forums(:other), forums(:default)]
+    Forum.ordered.should == [forums(:other), forums(:default)]
   end
 end

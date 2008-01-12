@@ -2,7 +2,7 @@
 
 <% content_for :right do -%>
 <% if admin? %>
-<% form_for :user, :url => admin_user_path(@user), :html => {:class => "xdialog"} do |f| -%>
+<% form_for @user.moderatorships.build, :html => {:class => "xdialog"} do |f| -%>
   <h6><%= 'Admin &amp; Moderation'[:admin_and_moderation] %></h6>
 
   <% unless @user.forums.empty? -%>
@@ -12,24 +12,25 @@
   <ul class="flat">
   <% @user.forums.find(:all, :select => "#{Forum.table_name}.*, #{Moderatorship.table_name}.id as moderatorship_id").each do |forum| -%>
     <li>
-      <%#= link_to forum.name, forum_path(forum), :class => "hidden" %>
-      <%#= link_to 'remove', moderator_path(@user, forum.moderatorship_id), :method => :delete %>
-      <%= link_to forum.name, user_moderator_path(@user, forum.moderatorship_id), :method => :delete, :confirm => "#{'Remove user as moderator for'[:remove_user_as_moderator]} #{forum.name}?" %>
+      <%= link_to forum.name, moderatorship_path(forum.moderatorship_id), :method => :delete, :confirm => "#{'Remove user as moderator for'[:remove_user_as_moderator]} #{forum.name}?" %>
     </li>
   <% end -%>
   </ul>
   <% end -%>
 
+	<% unless @user.available_forums.empty? -%>
   <p>
 	<label><%= 'Add as moderator'[] %></label><br />
-	<select name="moderator">
-    <option value="-"></option>
-    <%= options_from_collection_for_select(Forum.find(:all, :order => 'position') - @user.forums, "id", "name") %>
-  </select></p>
+	<%= f.select :forum_id, @user.available_forums.collect { |forum| [forum.name, forum.id] }, :include_blank => " - " %>
+	</p>
+	<% end -%>
 
-  <p><label><%= f.check_box :admin %> <%= 'User is an administrator'[] %></label></p>
+  <p><label><%= check_box_tag :admin, @user.admin? %> <%= 'User is an administrator'[] %></label></p>
 
-  <p><%= submit_tag 'Save'[:save_title] %></p>
+  <p>
+		<%= f.submit 'Save'[:save_title] %>
+		<%= f.hidden_field :user_id %>
+	</p>
 <% end -%>
 <% end -%>
 <% end -%>
@@ -44,14 +45,14 @@
     <%= '{count} topics'[(count=@user.topics.size)==1 ? :topic_count : :topics_count, number_with_delimiter(count)] %>, 
     <%= '{count} posts'[(count=@user.posts.size)==1 ? :post_count : :posts_count, number_with_delimiter(count)] %>
     (<%= 'view'[] %> <%= link_to 'all'[:view_all], user_posts_path(@user) %> | 
-    <%= link_to 'monitored'[], monitored_posts_path(@user) %> <%= 'posts'[] %>)<br />
+    <%= link_to 'monitored'[], "monitored_posts_path(@user)" %> <%= 'posts'[] %>)<br />
   </span>
 </p>
 
 <%= @user.bio_html %>
 
 <% unless @user.website.blank? -%>
-<p><strong><%= 'Website:'[:website_title] %></strong> <%= white_list link_to(@user.website.gsub("http://",""), "http://" + @user.website.gsub("http://","")) %>
+<p><strong><%= 'Website:'[:website_title] %></strong> <%= sanitize link_to(@user.website.gsub("http://",""), "http://" + @user.website.gsub("http://","")) %>
 <% end -%>
 <p><%= 'User since'[] %> <%= @user.created_at.to_date.to_s :long %></p>
 

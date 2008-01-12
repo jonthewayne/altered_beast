@@ -24,9 +24,9 @@ class Forum < ActiveRecord::Base
   has_many :moderatorships, :dependent => :delete_all
   has_many :moderators, :through => :moderatorships, :source => :user
 
-  # retrieves forums ordered by position
-  def self.find_ordered(options = {})
-    find :all, options.update(:order => 'position')
+  # oh has_finder i eagerly await thee
+  def self.ordered
+    find :all, :order => 'position'
   end
   
   def to_param

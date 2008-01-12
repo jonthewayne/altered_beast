@@ -10,7 +10,7 @@ class User < ActiveRecord::Base
   has_many :topics, :order => "#{Topic.table_name}.created_at desc"
   
   has_many :moderatorships, :dependent => :delete_all
-  has_many :moderated_forums, :through => :moderatorships, :source => :forum
+  has_many :forums, :through => :moderatorships, :source => :forum
   
   has_many :monitorships, :dependent => :delete_all
   has_many :monitored_topics, :through => :monitorships, :source => :topic, :conditions => {"#{Monitorship.table_name}.active" => true}
@@ -25,6 +25,10 @@ class User < ActiveRecord::Base
   
   def self.index_from(records)
     prefetch_from(records).index_by(&:id)
+  end
+
+  def available_forums
+    @available_forums ||= site.ordered_forums - forums
   end
 
   def moderator_of?(forum)

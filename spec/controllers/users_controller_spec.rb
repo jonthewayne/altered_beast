@@ -79,3 +79,61 @@ describe UsersController do
       :password => 'quire', :password_confirmation => 'quire' }.merge(options)
   end
 end
+
+describe UsersController, "PUT #update" do
+  before do
+    login_as :default
+    current_site :default
+    @attributes = {'login' => "Default"}
+    @controller.stub!(:current_site).and_return(@site)
+    @controller.stub!(:login_required).and_return(true)
+  end
+  
+  describe UsersController, "(successful save)" do
+    define_models :stubbed
+    act! { put :update, :id => 1, :user => @attributes }
+
+    before do
+      @user.stub!(:save).and_return(true)
+    end
+    
+    it_assigns :user, :flash => { :notice => :not_nil }
+    it_redirects_to { settings_path }
+  end
+  
+  describe UsersController, "(successful save, xml)" do
+    define_models :stubbed
+    act! { put :update, :id => 1, :user => @attributes, :format => 'xml' }
+
+    before do
+      @user.stub!(:save).and_return(true)
+    end
+    
+    it_assigns :user
+    it_renders :blank
+  end
+
+  describe UsersController, "(unsuccessful save)" do
+    define_models :stubbed
+    act! { put :update, :id => 1, :user => @attributes }
+
+    before do
+      @user.stub!(:save).and_return(false)
+    end
+    
+    it_assigns :user
+    it_renders :template, :edit
+  end
+  
+  describe UsersController, "(unsuccessful save, xml)" do
+    define_models :stubbed
+    act! { put :update, :id => 1, :user => @attributes, :format => 'xml' }
+
+    before do
+      @user.stub!(:save).and_return(false)
+    end
+    
+    it_assigns :user
+    it_renders :xml, "user.errors", :status => :unprocessable_entity
+  end
+end

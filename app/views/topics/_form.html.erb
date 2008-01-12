@@ -21,7 +21,7 @@
 </p>
 <% end -%>
 
-<% if admin? && !@topic.new_record? && forums = Forum.find_ordered -%>
+<% if admin? && !@topic.new_record? && forums = current_site.ordered_forums -%>
 	<% if forums.size > 1 -%>
 <p id="topic_forum_id">
   <label for="topic_forum_id"><%= 'Forum'[:forum_title] %></label><br />

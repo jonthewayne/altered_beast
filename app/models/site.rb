@@ -32,7 +32,7 @@ class Site < ActiveRecord::Base
   
   # <3 rspec
   def ordered_forums(*args)
-    forums.find_ordered(*args)
+    forums.ordered(*args)
   end
   
   def default?

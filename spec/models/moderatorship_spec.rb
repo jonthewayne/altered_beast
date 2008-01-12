@@ -75,11 +75,11 @@ describe Forum, "#moderators" do
   end
 end
 
-describe User, "#moderated_forums" do
+describe User, "#forums" do
   define_models :moderators
 
   it "finds forums for users" do
-    users(:default).moderated_forums.sort_by(&:name).should == [forums(:default), forums(:other)]
-    users(:other).moderated_forums.should == [forums(:default)]
+    users(:default).forums.sort_by(&:name).should == [forums(:default), forums(:other)]
+    users(:other).forums.should == [forums(:default)]
   end
 end
