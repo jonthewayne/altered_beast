@@ -114,7 +114,7 @@ ActiveRecord::Schema.define(:version => 1) do
   end
 
   add_index "users", ["last_seen_at"], :name => "index_users_on_last_seen_at"
-  add_index "users", ["posts_count"], :name => "index_users_on_posts_count"
-  add_index "users", ["permalink"], :name => "index_users_on_permalink"
+  add_index "users", ["site_id", "posts_count"], :name => "index_site_users_on_posts_count"
+  add_index "users", ["site_id", "permalink"], :name => "index_site_users_on_permalink"
 
 end
