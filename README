@@ -15,7 +15,7 @@ The popular rails-based Beast forum...
 
 help desired via git:
 
-  git clone git@git.caboo.se:altered_beast.git
+  git clone git://git.caboo.se/altered_beast.git
 
 INSTALLATION
 ============

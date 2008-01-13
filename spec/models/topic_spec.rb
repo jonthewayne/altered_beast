@@ -103,16 +103,24 @@ module TopicCreatePostHelper
       @creating_topic.should change { Post.count }.by(1)
     end
     
+    base.it "increments cached site topics_count" do
+      @creating_topic.should change { sites(:default).reload.topics_count }.by(1)
+    end
+    
     base.it "increments cached forum topics_count" do
-      @creating_topic.should change { forums(:default).reload.topics.size }.by(1)
+      @creating_topic.should change { forums(:default).reload.topics_count }.by(1)
+    end
+    
+    base.it "increments cached site posts_count" do
+      @creating_topic.should change { sites(:default).reload.posts_count }.by(1)
     end
     
     base.it "increments cached forum posts_count" do
-      @creating_topic.should change { forums(:default).reload.posts.size }.by(1)
+      @creating_topic.should change { forums(:default).reload.posts_count }.by(1)
     end
     
     base.it "increments cached user posts_count" do
-      @creating_topic.should change { users(:default).reload.posts.size }.by(1)
+      @creating_topic.should change { users(:default).reload.posts_count }.by(1)
     end
   end
 
@@ -210,15 +218,19 @@ describe Topic, "#post!" do
   end
   
   it "increments cached topic posts_count" do
-    @creating_post.should change { topics(:default).reload.posts.size }.by(1)
+    @creating_post.should change { topics(:default).reload.posts_count }.by(1)
   end
   
   it "increments cached forum posts_count" do
-    @creating_post.should change { forums(:default).reload.posts.size }.by(1)
+    @creating_post.should change { forums(:default).reload.posts_count }.by(1)
+  end
+  
+  it "increments cached site posts_count" do
+    @creating_post.should change { sites(:default).reload.posts_count }.by(1)
   end
   
   it "increments cached user posts_count" do
-    @creating_post.should change { users(:default).reload.posts.size }.by(1)
+    @creating_post.should change { users(:default).reload.posts_count }.by(1)
   end
 
   def post!
@@ -249,15 +261,23 @@ describe Topic, "being deleted" do
   end
   
   it "decrements cached forum topics_count" do
-    @deleting_topic.should change { forums(:default).reload.topics.size }.by(-1)
+    @deleting_topic.should change { forums(:default).reload.topics_count }.by(-1)
   end
   
   it "decrements cached forum posts_count" do
-    @deleting_topic.should change { forums(:default).reload.posts.size }.by(-1)
+    @deleting_topic.should change { forums(:default).reload.posts_count }.by(-1)
+  end
+  
+  it "decrements cached site topics_count" do
+    @deleting_topic.should change { sites(:default).reload.topics_count }.by(-1)
+  end
+  
+  it "decrements cached site posts_count" do
+    @deleting_topic.should change { sites(:default).reload.posts_count }.by(-1)
   end
   
   it "decrements cached user posts_count" do
-    @deleting_topic.should change { users(:default).reload.posts.size }.by(-1)
+    @deleting_topic.should change { users(:default).reload.posts_count }.by(-1)
   end
 end
 
@@ -291,5 +311,42 @@ describe Topic, "being moved to another forum" do
     @topic.posts.each { |p| p.forum.should == @forum }
     @moving_forum.call
     @topic.posts.each { |p| p.reload.forum.should == @new_forum }
+  end
+end
+
+describe Topic, "#editable_by?" do
+  before do
+    @user  = mock_model User
+    @topic = Topic.new
+  end
+
+  it "restricts user for other topic" do
+    @user.should_receive(:admin?).and_return(false)
+    @user.should_receive(:moderator_of?).and_return(false)
+    @topic.should_not be_editable_by(@user)
+  end
+
+  it "allows user" do
+    @topic.user_id = @user.id
+    @topic.should be_editable_by(@user)
+  end
+  
+  it "allows admin" do
+    @user.should_receive(:admin?).and_return(true)
+    @topic.should be_editable_by(@user)
+  end
+  
+  it "restricts moderator for other forum" do
+    @user.should_receive(:admin?).and_return(false)
+    @user.should_receive(:moderator_of?).with(1).and_return(false)
+    @topic.forum_id = 1
+    @topic.should_not be_editable_by(@user)
+  end
+  
+  it "allows moderator" do
+    @user.should_receive(:admin?).and_return(false)
+    @user.should_receive(:moderator_of?).with(2).and_return(true)
+    @topic.forum_id = 2
+    @topic.should be_editable_by(@user)
   end
 end

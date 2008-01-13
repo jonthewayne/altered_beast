@@ -4,7 +4,8 @@ class <%= controller_class_name %>Controller < ApplicationController
 
     respond_to do |format|
       format.html # index.html.erb
-      format.xml  { render :xml => @<%= table_name %> }
+      format.xml  { render :xml  => @<%= table_name %> }
+      format.json { render :json => @<%= table_name %> }
     end
   end
 
@@ -13,7 +14,8 @@ class <%= controller_class_name %>Controller < ApplicationController
 
     respond_to do |format|
       format.html # show.html.erb
-      format.xml  { render :xml => @<%= file_name %> }
+      format.xml  { render :xml  => @<%= file_name %> }
+      format.json { render :json => @<%= file_name %> }
     end
   end
 
@@ -22,12 +24,9 @@ class <%= controller_class_name %>Controller < ApplicationController
 
     respond_to do |format|
       format.html # new.html.erb
-      format.xml  { render :xml => @<%= file_name %> }
+      format.xml  { render :xml  => @<%= file_name %> }
+      format.json { render :json => @<%= file_name %> }
     end
-  end
-
-  def edit
-    @<%= file_name %> = <%= class_name %>.find(params[:id])
   end
 
   def create
@@ -37,12 +36,18 @@ class <%= controller_class_name %>Controller < ApplicationController
       if @<%= file_name %>.save
         flash[:notice] = '<%= class_name %> was successfully created.'
         format.html { redirect_to(@<%= file_name %>) }
-        format.xml  { render :xml => @<%= file_name %>, :status => :created, :location => @<%= file_name %> }
+        format.xml  { render :xml  => @<%= file_name %>, :status => :created, :location => @<%= file_name %> }
+        format.json { render :json => @<%= file_name %>, :status => :created, :location => @<%= file_name %> }
       else
         format.html { render :action => "new" }
-        format.xml  { render :xml => @<%= file_name %>.errors, :status => :unprocessable_entity }
+        format.xml  { render :xml  => @<%= file_name %>.errors, :status => :unprocessable_entity }
+        format.json { render :json => @<%= file_name %>.errors, :status => :unprocessable_entity }
       end
     end
+  end
+
+  def edit
+    @<%= file_name %> = <%= class_name %>.find(params[:id])
   end
 
   def update
@@ -53,9 +58,11 @@ class <%= controller_class_name %>Controller < ApplicationController
         flash[:notice] = '<%= class_name %> was successfully updated.'
         format.html { redirect_to(@<%= file_name %>) }
         format.xml  { head :ok }
+        format.json { head :ok }
       else
         format.html { render :action => "edit" }
-        format.xml  { render :xml => @<%= file_name %>.errors, :status => :unprocessable_entity }
+        format.xml  { render :xml  => @<%= file_name %>.errors, :status => :unprocessable_entity }
+        format.json { render :json => @<%= file_name %>.errors, :status => :unprocessable_entity }
       end
     end
   end
@@ -67,6 +74,7 @@ class <%= controller_class_name %>Controller < ApplicationController
     respond_to do |format|
       format.html { redirect_to(<%= table_name %>_url) }
       format.xml  { head :ok }
+      format.json { head :ok }
     end
   end
 end

@@ -1,8 +1,11 @@
 class UsersController < ApplicationController
-  # Protect these actions behind an admin login
-  # before_filter :admin_required, :only => [:suspend, :unsuspend, :destroy, :purge]
-  before_filter :find_user, :only => [:suspend, :unsuspend, :destroy, :purge]
+  before_filter :admin_required, :only => [:suspend, :unsuspend, :destroy, :purge]
+  before_filter :find_user, :only => [:update, :show, :suspend, :unsuspend, :destroy, :purge]
+  before_filter :login_required, :only => [:edit, :update]
   
+  def index
+    @users = current_site.users.paginate :all, :page => current_page
+  end
 
   # render new.rhtml
   def new
@@ -10,10 +13,6 @@ class UsersController < ApplicationController
 
   def create
     cookies.delete :auth_token
-    # protects against session fixation attacks, wreaks havoc with 
-    # request forgery protection.
-    # uncomment at your own risk
-    # reset_session
     @user = current_site.users.build(params[:user])
     raise ActiveRecord::RecordInvalid.new(@user) unless @user.valid?
     @user.register!
@@ -22,6 +21,27 @@ class UsersController < ApplicationController
     flash[:notice] = "Thanks for signing up!"
   rescue ActiveRecord::RecordInvalid
     render :action => 'new'
+  end
+
+  def edit
+    if params[:id]
+      redirect_to settings_path and return
+    end
+    @user = current_user
+  end
+
+  def update
+    @user = current_user
+    respond_to do |format|
+      if @user.update_attributes(params[:user])
+        flash[:notice] = 'Forum was successfully updated.'
+        format.html { redirect_to(settings_path) }
+        format.xml  { head :ok }
+      else
+        format.html { render :action => "edit" }
+        format.xml  { render :xml => @user.errors, :status => :unprocessable_entity }
+      end
+    end
   end
 
   def activate
@@ -52,14 +72,13 @@ class UsersController < ApplicationController
     @user.destroy
     redirect_to users_path
   end
-  
-  def index
-    @users = current_site.users.paginate :all, :page => params[:page]
-  end
 
 protected
   def find_user
-    @user = current_site.users.find(params[:id])
+    @user = current_site.users.find_by_permalink(params[:id])
   end
-
+  
+  def authorized?
+    params[:id].blank? || @user == current_user
+  end
 end

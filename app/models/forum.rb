@@ -1,9 +1,13 @@
 class Forum < ActiveRecord::Base
+  formats_attributes :description
+  
   acts_as_list
 
   validates_presence_of :name
   
   belongs_to :site
+  
+  has_permalink :name
   
   attr_readonly :posts_count, :topics_count
 
@@ -20,8 +24,12 @@ class Forum < ActiveRecord::Base
   has_many :moderatorships, :dependent => :delete_all
   has_many :moderators, :through => :moderatorships, :source => :user
 
-  # retrieves forums ordered by position
-  def self.find_ordered(options = {})
-    find :all, options.update(:order => 'position')
+  # oh has_finder i eagerly await thee
+  def self.ordered
+    find :all, :order => 'position'
+  end
+  
+  def to_param
+    permalink
   end
 end

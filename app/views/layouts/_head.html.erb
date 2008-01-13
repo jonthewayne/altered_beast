@@ -8,7 +8,7 @@
   <%= javascript_include_tag "prototype", "effects", "application", :cache => 'beast' %>
 <% unless @feed_icons.blank? -%>
   <% @feed_icons.each do |feed| -%>
-  <%= auto_discovery_link_tag :rss, feed[:url], :title => "Subscribe to '#{feed[:title]}'" %>
+  <%= auto_discovery_link_tag :atom, feed[:url], :title => "Subscribe to '#{feed[:title]}'" %>
   <% end -%>
 <% end -%>
   <link rel="search" type="application/opensearchdescription+xml" href="http://<%= request.host_with_port %>/open_search.xml" />
@@ -20,15 +20,15 @@
     <li><%= link_to 'Forums'[:forums_title], root_path, :rel => 'home' %></li>
     <li><%= link_to 'Users'[:users_title], users_path %></li>
     <li id="search">
-      <% form_tag 'search_all_posts_path', :method => 'get' do -%>
+      <% form_tag posts_path, :method => 'get' do -%>
         <%= text_field_tag :q, params[:q], :size => 15, :id => :search_box %>
       <% end -%>
     </li>
     <li><%= link_to_function 'Search'[:search_title], "$('search').toggle(); $('search_box').focus();", :href => root_path %></li>
 
-    <% if current_site and logged_in? -%>
-    <li class="login"><%=  link_to current_user.login, "TODO:user_path(current_user)" %></li>
-    <li class="logout"><%= link_to 'Settings'[:settings_title], "TODO:settings_path" %></li>
+    <% if logged_in? -%>
+    <li class="login"><%=  link_to current_user.login, user_path(current_user) %></li>
+    <li class="logout"><%= link_to 'Settings'[:settings_title], settings_path %></li>
     <li class="logout"><%= link_to 'Logout'[:logout_title], logout_path(:to => CGI.escape(request.request_uri)) %></li>
     <% else -%>
     <li><%= link_to 'Signup'[:signup_action], signup_path(:to => CGI.escape(request.request_uri)) %></li>

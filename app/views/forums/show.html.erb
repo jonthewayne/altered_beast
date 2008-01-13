@@ -30,7 +30,7 @@
 </h1>
 
 <p class="subtitle">
-  <%= feed_icon_tag @forum.name, "TODO:formatted_forum_posts_path(@forum, :rss)" %> 
+  <%= feed_icon_tag @forum.name, formatted_forum_posts_path(@forum, :atom) %> 
   <%= '{count} topic(s)'[(count=@forum.topics.size)==1 ? :topic_count : :topics_count, number_with_delimiter(count)] %>, 
   <%= '{count} post(s)'[(count=@forum.posts.size)==1 ? :post_count : :posts_count, number_with_delimiter(count)] %>
 </p>
@@ -70,18 +70,17 @@
   <td class="c2">
     <%= "Sticky"[:sticky_title]+": <strong>" if topic.sticky? %>
     <%= topic_title_link (topic), :class => "entry-title", :rel => "bookmark" %>
-    <%#= link_to h(topic.title), topic_path(@forum, topic), :class => "entry-title", :rel => "bookmark" %>
     <%= "</strong>" if topic.sticky? %>
     <% if topic.paged? -%>
-    <small><%= link_to 'last'[], topic_path(:forum_id => @forum, :id => topic, :page => topic.last_page) %></small>
+    <small><%= link_to 'last'[], forum_topic_path(@forum, topic, :page => topic.last_page) %></small>
     <% end -%>
   </td>
   <td class="ca inv stat"><%= topic.posts.size %></td>
-  <td class="ca inv stat"><%= number_with_delimiter(topic.views) %></td>
+  <td class="ca inv stat"><%= number_with_delimiter(topic.hits) %></td>
   <td class="lp">
-    <abbr class="updated" title="<%= topic.replied_at.xmlschema %>"><%= time_ago_in_words(topic.replied_at) %></abbr>
-    <%= 'by {user}'[:by_user, "<span class=\"author\"><strong class=\"fn\">#{h(topic.replied_by_user.display_name)}</strong></span>"] %>
-    <span><%= link_to 'view'[], topic_path(:forum_id => @forum, :id => topic, :page => topic.last_page, :anchor => "posts-#{topic.last_post_id}") %></span>
+    <abbr class="updated" title="<%= topic.last_updated_at.xmlschema %>"><%= time_ago_in_words(topic.last_updated_at) %></abbr>
+    <%= 'by {user}'[:by_user, "<span class=\"author\"><strong class=\"fn\">#{h(topic.last_user.display_name)}</strong></span>"] %>
+    <span><%= link_to 'view'[], forum_topic_path(@forum, topic, :page => topic.last_page, :anchor => "posts-#{topic.last_post_id}") %></span>
   </td>
 </tr>
 <% end %>

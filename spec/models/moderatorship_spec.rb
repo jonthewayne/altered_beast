@@ -5,6 +5,14 @@ describe Moderatorship do
     model Moderatorship do
       stub :user => all_stubs(:user), :forum => all_stubs(:forum)
     end
+    
+    model Site do
+      stub :other, :name => 'other'
+    end
+    
+    model Forum do
+      stub :other_site, :name => "Other", :site => all_stubs(:other_site)
+    end
   end
 
   it "adds user/forum relation" do
@@ -27,6 +35,12 @@ describe Moderatorship do
   it "doesn't add duplicate relation" do
     lambda do
       forums(:default).moderators << users(:default)
+    end.should raise_error(ActiveRecord::RecordInvalid)
+  end
+  
+  it "doesn't add relation for user and forum in different sites" do
+    lambda do
+      forums(:other_site).moderators << users(:default)
     end.should raise_error(ActiveRecord::RecordInvalid)
   end
   
@@ -61,11 +75,11 @@ describe Forum, "#moderators" do
   end
 end
 
-describe User, "#moderated_forums" do
+describe User, "#forums" do
   define_models :moderators
 
   it "finds forums for users" do
-    users(:default).moderated_forums.sort_by(&:name).should == [forums(:default), forums(:other)]
-    users(:other).moderated_forums.should == [forums(:default)]
+    users(:default).forums.sort_by(&:name).should == [forums(:default), forums(:other)]
+    users(:other).forums.should == [forums(:default)]
   end
 end

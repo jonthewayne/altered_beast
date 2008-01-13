@@ -2,7 +2,7 @@ require File.dirname(__FILE__) + '<%= '/..' * class_nesting_depth %>/../spec_hel
 
 describe <%= class_name %> do
   # Replace this with your real tests.
-  it "passed"
+  it "passed" do
     1.should == 1
   end
 end

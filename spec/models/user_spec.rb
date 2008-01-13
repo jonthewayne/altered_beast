@@ -1,19 +1,25 @@
 require File.dirname(__FILE__) + '/../spec_helper'
 
 describe User do
-  define_models do 
-    model User do
-      stub :admin,     :login => 'admin-user',     :email => 'admin-user@example.com', :remember_token => 'blah'
-      stub :pending,   :login => 'pending-user',   :email => 'pending-user@example.com',   :state => 'pending', :activated_at => nil, :remember_token => 'asdf'
-      stub :suspended, :login => 'suspended-user', :email => 'suspended-user@example.com', :state => 'suspended', :remember_token => 'dfdfd'
-    end
-  end
+  define_models :users
 
-  it 'creates user' do
-    lambda do
-      user = create_user
-      violated "#{user.errors.full_messages.to_sentence}" if user.new_record?
-    end.should change(User, :count).by(1)
+  describe User, "being created" do
+    define_models :users
+  
+    before do
+      @creating_user = lambda do
+        user = create_user
+        violated "#{user.errors.full_messages.to_sentence}" if user.new_record?
+      end
+    end
+  
+    it 'increments User.count' do
+      @creating_user.should change(User, :count).by(1)
+    end
+  
+    it 'increments Site#users_count' do
+      @creating_user.should change { sites(:default).reload.users_count }.by(1)
+    end
   end
 
   [:login, :password, :password_confirmation, :email, :site_id].each do |attr|
@@ -23,6 +29,25 @@ describe User do
         u.errors.on(attr).should_not be_nil
       end.should_not change(User, :count)
     end
+  end
+  
+  it "formats User#bio" do
+    u = User.new :bio => 'foo'
+    u.bio_html.should be_nil
+    u.send :format_attributes
+    u.bio_html.should == '<p>foo</p>'
+  end
+  
+  it "sets User#display_name from login if nil" do
+    user = User.new :login => 'foo'
+    user.display_name.should == user.login
+  end
+  
+  it "#seen! sets #last_seen_at" do
+    user = users(:default)
+    user.last_seen_at.should be_nil
+    user.seen!
+    user.last_seen_at.should_not be_nil
   end
 
   it 'resets password' do
@@ -103,9 +128,25 @@ describe User do
 protected
   def create_user(options = {})
     returning User.new({ :login => 'quire', :email => 'quire@example.com', :password => 'quire', :password_confirmation => 'quire' }.merge(options)) do |u|
-      u.site_id = options.key?(:site_id) ? options[:site_id] : 1
+      u.site_id = options.key?(:site_id) ? options[:site_id] : sites(:default).id
       u.save
     end
+  end
+end
+
+describe User, "being deleted" do
+  define_models :users
+
+  before do
+    @deleting_user = lambda { users(:default).destroy }
+  end
+
+  it 'decrements User.count' do
+    @deleting_user.should change(User, :count).by(-1)
+  end
+
+  it 'decrements Site#users_count' do
+    @deleting_user.should change { sites(:default).reload.users_count }.by(-1)
   end
 end
 

@@ -1,7 +1,7 @@
 module AuthenticatedSystem
   protected
     def current_site
-      @current_site ||= Site.find_by_host(request.host)
+      @current_site ||= Site.find_by_host(request.host) or raise Site::UndefinedError
     end
     
     # Returns true or false if the user is logged in.

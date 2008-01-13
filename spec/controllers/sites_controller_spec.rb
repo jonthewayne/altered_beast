@@ -13,22 +13,21 @@ describe SitesController, "GET #index" do
 
   before do
     @sites = [sites(:default), sites(:other)]
-    Site.stub!(:paginate).with(:all, :page => params[:page], :order => 'host ASC').and_return(@sites)
+    Site.stub!(:paginate).with(:all, :page => 1, :order => 'host ASC').and_return(@sites)
     @controller.stub!(:admin_required).and_return(true)
     @controller.stub!(:require_site)
   end
   
-  it.assigns :sites
-  it.renders :template, :index
-  
+  it_assigns :sites
+  it_renders :template, :index
   
   describe SitesController, "(xml)" do
     define_models :sites_controller
     
     act! { get :index, :format => 'xml' }
 
-    it.assigns :sites
-    it.renders :xml, :sites
+    it_assigns :sites
+    it_renders :xml, :sites
   end
 end
 
@@ -44,15 +43,15 @@ describe SitesController, "GET #show" do
     @controller.stub!(:require_site)
   end
   
-  it.assigns :site
-  it.renders :template, :show
+  it_assigns :site
+  it_renders :template, :show
   
   describe SitesController, "(xml)" do
     define_models :sites_controller
     
     act! { get :show, :id => 1, :format => 'xml' }
 
-    it.renders :xml, :site
+    it_renders :xml, :site
   end
 end
 
@@ -74,13 +73,13 @@ describe SitesController, "GET #new" do
     assigns[:site].host.should == "my.host"
   end
   
-  it.renders :template, :new
+  it_renders :template, :new
   
   describe SitesController, "(xml)" do
     define_models :sites_controller
     act! { get :new, :format => 'xml' }
 
-    it.renders :xml, :site
+    it_renders :xml, :site
   end
 end
 
@@ -95,8 +94,8 @@ describe SitesController, "GET #edit" do
     @controller.stub!(:require_site)
   end
 
-  it.assigns :site
-  it.renders :template, :edit
+  it_assigns :site
+  it_renders :template, :edit
 end
 
 describe SitesController, "POST #create" do
@@ -114,8 +113,8 @@ describe SitesController, "POST #create" do
       @site.stub!(:save).and_return(true)
     end
     
-    it.assigns :site, :flash => { :notice => :not_nil }
-    it.redirects_to { signup_path(:host => @site.host) }
+    it_assigns :site, :flash => { :notice => :not_nil }
+    it_redirects_to { signup_path(:host => @site.host) }
   end
   
   describe SitesController, "(successful creation, xml)" do
@@ -127,8 +126,8 @@ describe SitesController, "POST #create" do
       @site.stub!(:to_xml).and_return("<site />")
     end
     
-    it.assigns :site, :headers => { :Location => lambda { site_url(@site) } }
-    it.renders :xml, :site, :status => :created
+    it_assigns :site, :headers => { :Location => lambda { site_url(@site) } }
+    it_renders :xml, :site, :status => :created
   end
 
   describe SitesController, "(unsuccessful creation)" do
@@ -139,8 +138,8 @@ describe SitesController, "POST #create" do
       @site.stub!(:save).and_return(false)
     end
     
-    it.assigns :site
-    it.renders :template, :new
+    it_assigns :site
+    it_renders :template, :new
   end
   
   describe SitesController, "(unsuccessful creation, xml)" do
@@ -151,8 +150,8 @@ describe SitesController, "POST #create" do
       @site.stub!(:save).and_return(false)
     end
     
-    it.assigns :site
-    it.renders :xml, "site.errors", :status => :unprocessable_entity
+    it_assigns :site
+    it_renders :xml, "site.errors", :status => :unprocessable_entity
   end
 end
 
@@ -173,8 +172,8 @@ describe SitesController, "PUT #update" do
       @site.stub!(:save).and_return(true)
     end
     
-    it.assigns :site, :flash => { :notice => :not_nil }
-    it.redirects_to { site_path(@site) }
+    it_assigns :site, :flash => { :notice => :not_nil }
+    it_redirects_to { site_path(@site) }
   end
   
   describe SitesController, "(successful save, xml)" do
@@ -185,8 +184,8 @@ describe SitesController, "PUT #update" do
       @site.stub!(:save).and_return(true)
     end
     
-    it.assigns :site
-    it.renders :blank
+    it_assigns :site
+    it_renders :blank
   end
 
   describe SitesController, "(unsuccessful save)" do
@@ -197,8 +196,8 @@ describe SitesController, "PUT #update" do
       @site.stub!(:save).and_return(false)
     end
     
-    it.assigns :site
-    it.renders :template, :edit
+    it_assigns :site
+    it_renders :template, :edit
   end
   
   describe SitesController, "(unsuccessful save, xml)" do
@@ -209,8 +208,8 @@ describe SitesController, "PUT #update" do
       @site.stub!(:save).and_return(false)
     end
     
-    it.assigns :site
-    it.renders :xml, "site.errors", :status => :unprocessable_entity
+    it_assigns :site
+    it_renders :xml, "site.errors", :status => :unprocessable_entity
   end
 end
 
@@ -226,14 +225,14 @@ describe SitesController, "DELETE #destroy" do
     @controller.stub!(:require_site)
   end
 
-  it.assigns :site
-  it.redirects_to { sites_path }
+  it_assigns :site
+  it_redirects_to { sites_path }
   
   describe SitesController, "(xml)" do
     define_models :sites_controller
     act! { delete :destroy, :id => 1, :format => 'xml' }
 
-    it.assigns :site
-    it.renders :blank
+    it_assigns :site
+    it_renders :blank
   end
 end

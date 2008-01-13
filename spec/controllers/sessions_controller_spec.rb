@@ -1,42 +1,68 @@
 require File.dirname(__FILE__) + '/../spec_helper'
 
-describe SessionsController do
+describe SessionsController, "POST /create" do
   define_models
 
-  it 'logins and redirects' do
-    post :create, :login => users(:default).login, :password => 'test'
-    session[:user].should_not be_nil
-    response.should be_redirect
+  before do
+    @login = {
+      :user    => :default,
+      :pass    => 'test',
+      :options => {}}
   end
   
+  act! { post :create, @login[:options].merge(:login => users(@login[:user]).login, :password => @login[:pass]) }
+
+  it_assigns :flash => {:notice => :not_nil},
+    :session => {:user => :not_nil}
+  it_redirects_to { '/' }
+  
   it 'fails login and does not redirect' do
-    post :create, :login => users(:default).login, :password => 'bad password'
+    attempt_login 'bad password'
     session[:user].should be_nil
     response.should be_success
   end
 
-  it 'logs out' do
-    login_as :default
-    get :destroy
-    session[:user].should be_nil
-    response.should be_redirect
-  end
-
   it 'remembers me' do
-    post :create, :login => users(:default).login, :password => 'test', :remember_me => "1"
+    attempt_login :remember_me => '1'
     response.cookies["auth_token"].should_not be_nil
   end
   
   it 'does not remember me' do
-    post :create, :login => users(:default).login, :password => 'test', :remember_me => "0"
+    attempt_login :remember_me => '0'
     response.cookies["auth_token"].should be_nil
   end
+  
+  def attempt_login(user = nil, password = nil, options = {})
+    case user
+      when Hash
+        options = user
+        user = nil; password = nil
+      when String
+        password = user; user = nil
+    end
+    @login[:user] = user if user
+    @login[:pass] = password if password
+    @login[:options].update(options)
+    acting
+  end
+end
+
+describe SessionsController, "DELETE /destroy" do
+  define_models
+
+  before { login_as :default }
+  act! { get :destroy }
+  
+  it_assigns :session => {:user => nil}
+  it_redirects_to { '/' }
 
   it 'deletes token on logout' do
-    login_as :default
-    get :destroy
-    response.cookies["auth_token"].should == []
+    acting.cookies["auth_token"].should == []
   end
+end
+
+describe SessionsController, "(cookies)" do
+  define_models
 
   it 'logs in with cookie' do
     users(:default).remember_me

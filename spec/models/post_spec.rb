@@ -13,6 +13,13 @@ describe Post do
     p.should_not be_valid
     p.errors.on(:body).should_not be_nil
   end
+
+  it "formats body html" do
+    p = Post.new :body => 'bar'
+    p.body_html.should be_nil
+    p.send :format_attributes
+    p.body_html.should == '<p>bar</p>'
+  end
 end
 
 describe Post, "being deleted" do
@@ -22,6 +29,22 @@ describe Post, "being deleted" do
     end
   end
   
+  before do
+    @deleting_post = lambda { posts(:default).destroy }
+  end
+
+  it "decrements cached forum posts_count" do
+    @deleting_post.should change { forums(:default).reload.posts_count }.by(-1)
+  end
+  
+  it "decrements cached site posts_count" do
+    @deleting_post.should change { sites(:default).reload.posts_count }.by(-1)
+  end
+  
+  it "decrements cached user posts_count" do
+    @deleting_post.should change { users(:default).reload.posts_count }.by(-1)
+  end
+
   it "fixes last_user_id" do
     topics(:default).last_user_id = 1; topics(:default).save
     posts(:default).destroy
@@ -55,15 +78,15 @@ describe Post, "#editable_by?" do
     @post  = Post.new
   end
 
-  it "allows user" do
+  it "restricts user for other post" do
     @user.should_receive(:admin?).and_return(false)
     @user.should_receive(:moderator_of?).and_return(false)
     @post.should_not be_editable_by(@user)
   end
 
-  it "restricts user for other post" do
+  it "allows user" do
     @post.user_id = @user.id
-    @post.should     be_editable_by(@user)
+    @post.should be_editable_by(@user)
   end
   
   it "allows admin" do

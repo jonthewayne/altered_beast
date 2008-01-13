@@ -1,4 +1,8 @@
 class Post < ActiveRecord::Base
+  include User::Editable
+  
+  formats_attributes :body
+
   # author of post
   belongs_to :user, :counter_cache => true
   
@@ -7,7 +11,10 @@ class Post < ActiveRecord::Base
   # topic's forum (set by callback)
   belongs_to :forum, :counter_cache => true
   
-  validates_presence_of :user_id, :topic_id, :forum_id, :body
+  # topic's site (set by callback)
+  belongs_to :site, :counter_cache => true
+  
+  validates_presence_of :user_id, :site_id, :topic_id, :forum_id, :body
   validate :topic_is_not_locked
 
   after_create  :update_cached_fields
@@ -15,15 +22,17 @@ class Post < ActiveRecord::Base
 
   attr_accessible :body
 
-  def editable_by?(user)
-    user && (user.id == user_id || user.admin? || user.moderator_of?(forum_id))
+  def self.search(query, options = {})
+    options[:conditions] ||= ["LOWER(#{Post.table_name}.body) LIKE ?", "%#{query}%"] unless query.blank?
+    options[:select]     ||= "#{Post.table_name}.*, #{Topic.table_name}.title as topic_title, #{Forum.table_name}.name as forum_name"
+    options[:joins]      ||= "inner join #{Topic.table_name} on #{Post.table_name}.topic_id = #{Topic.table_name}.id inner join #{Forum.table_name} on #{Topic.table_name}.forum_id = #{Forum.table_name}.id"
+    options[:order]      ||= "#{Post.table_name}.created_at DESC"
+    options[:count]      ||= {:select => "#{Post.table_name}.id"}
+    paginate options
   end
 
 protected
-  # using count isn't ideal but it gives us correct caches each time
   def update_cached_fields
-    #Forum.update_all ['posts_count = ?', Post.count(:id, :conditions => {:forum_id => forum_id})], ['id = ?', forum_id]
-    #User.update_posts_count(user_id)
     topic.update_cached_post_fields(self)
   end
   
