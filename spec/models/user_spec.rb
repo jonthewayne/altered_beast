@@ -120,4 +120,8 @@ describe User, "with no created users" do
     user.save!
     user.should be_admin
   end
+  
+  it 'creates initial user as admin for each site' do
+    pending "unique per site"
+  end
 end
