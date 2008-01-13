@@ -72,6 +72,7 @@ describe UsersController do
     User.delete_all
     create_user
     user = User.find_by_login('quire')
+    assigns[:current_user].site.should == sites(:default)
     assigns[:current_user].should == user
     assigns[:current_user].should be_admin
     assigns[:current_user].should be_active
