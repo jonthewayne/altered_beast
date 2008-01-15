@@ -1,7 +1,9 @@
 tmp
 log
 config/database.yml
+vendor/rails
 db/*.sqlite
 db/*.sqlite2
 db/*.sqlite3
 db/*.db
+public/javascripts/beast.js
