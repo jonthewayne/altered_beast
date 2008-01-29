@@ -60,4 +60,9 @@ module ApplicationHelper
       end
     atom ? send("formatted_#{prefix}_posts_path", options.update(:format => :atom)) : send("#{prefix}_posts_path", options)
   end
+
+  @@default_jstime_format = "%d %b, %Y %I:%M %p"
+  def jstime(time, format = nil)
+    content_tag 'span', time.strftime(format || @@default_jstime_format), :class => 'time'
+  end
 end

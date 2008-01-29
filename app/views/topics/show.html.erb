@@ -82,7 +82,7 @@
     <div class="date">
       <a href="#<%= dom_id post %>" rel="bookmark">
       <abbr class="updated" title="<%= post.created_at.xmlschema %>">
-      <%= time_ago_in_words(post.created_at) %>
+      <%= jstime(post.created_at) %>
       </abbr>
       </a>
     </div>
