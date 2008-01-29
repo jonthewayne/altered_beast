@@ -2,7 +2,7 @@
 <label for="topic_title"><%= 'Title'[:title_title] %></label><br />
 <%= form.text_field :title, :onchange => "/*TopicForm.editNewTitle(this);*/", :class => "primary", :tabindex => 10 %>
 
-<% if admin? || current_user.moderator_of?(@topic.forum) -%>
+<% for_moderators_of @topic do -%>
 <label style="margin-left:1em;">
 <%= form.check_box :sticky %> <%= 'Sticky'[:sticky_title] %>
 </label>
@@ -10,7 +10,6 @@
 <label style="margin-left:1em;">
 <%= form.check_box :locked %> <%= 'Locked'[:locked_title] %>
 </label>
-
 <% end -%>
 
 </p>

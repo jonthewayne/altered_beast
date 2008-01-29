@@ -56,8 +56,9 @@ class TopicsController < ApplicationController
   end
 
   def update
+    current_user.revise @topic, params[:topic]
     respond_to do |format|
-      if @topic.update_attributes(params[:topic])
+      if @topic.errors.empty?
         flash[:notice] = 'Topic was successfully updated.'
         format.html { redirect_to(forum_topic_path(@forum, @topic)) }
         format.xml  { head :ok }

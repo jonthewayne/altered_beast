@@ -114,6 +114,78 @@ describe User, "#post for admins" do
   end
 end
 
+module TopicUpdatePostHelper
+  def self.included(base)
+    base.define_models
+    
+    base.before do
+      @user  = users(:default)
+      @topic = topics(:default)
+      @attributes = {:body => 'booya'}
+    end
+  end
+  
+  def revise!
+    @user.revise @topic, @attributes
+  end
+end
+
+describe User, "#revise(topic) for users" do  
+  include TopicUpdatePostHelper
+  
+  it "ignores sticky bit" do
+    @attributes[:sticky] = 1
+    revise!
+    @topic.should_not be_sticky
+  end
+  
+  it "ignores locked bit" do
+    @attributes[:locked] = true
+    revise!
+    @topic.should_not be_locked
+  end
+end
+
+describe User, "#revise(topic) for moderators" do
+  include TopicUpdatePostHelper
+  
+  before do
+    @user.stub!(:moderator_of?).and_return(true)
+  end
+  
+  it "sets sticky bit" do
+    @attributes[:sticky] = 1
+    revise!
+    @topic.should be_sticky
+  end
+  
+  it "sets locked bit" do
+    @attributes[:locked] = true
+    revise!
+    @topic.should be_locked
+  end
+end
+
+describe User, "#revise(topic) for admins" do
+  include TopicUpdatePostHelper
+  
+  before do
+    @user.admin = true
+  end
+  
+  it "sets sticky bit" do
+    @attributes[:sticky] = 1
+    revise!
+    @topic.should be_sticky
+  end
+  
+  it "sets locked bit" do
+    @attributes[:locked] = true
+    revise!
+    @topic.should be_locked
+  end
+end
+
 describe User, "#reply" do
   define_models
   

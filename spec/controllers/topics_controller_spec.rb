@@ -204,12 +204,14 @@ end
 
 describe TopicsController, "PUT #update" do
   before do
+    login_as :default
     @forum  = forums(:default)
     Forum.stub!(:find_by_permalink).with('1').and_return(@forum)
     @attributes = {}
     @topic = topics(:default)
     @forum.stub!(:topics).and_return([])
     @forum.topics.stub!(:find_by_permalink).with('1').and_return(@topic)
+    @user.stub!(:revise).with(@topic, @attributes)
   end
   
   describe TopicsController, "(successful save)" do
@@ -217,7 +219,7 @@ describe TopicsController, "PUT #update" do
     act! { put :update, :forum_id => 1, :id => 1, :topic => @attributes }
 
     before do
-      @topic.stub!(:save).and_return(true)
+      @topic.stub!(:errors).and_return([])
     end
     
     it_assigns :topic, :flash => { :notice => :not_nil }
@@ -229,7 +231,7 @@ describe TopicsController, "PUT #update" do
     act! { put :update, :forum_id => 1, :id => 1, :topic => @attributes }
 
     before do
-      @topic.stub!(:save).and_return(false)
+      @topic.stub!(:errors).and_return([1])
     end
     
     it_assigns :topic
@@ -241,7 +243,7 @@ describe TopicsController, "PUT #update" do
     act! { put :update, :forum_id => 1, :id => 1, :topic => @attributes, :format => 'xml' }
 
     before do
-      @topic.stub!(:save).and_return(true)
+      @topic.stub!(:errors).and_return([])
     end
     
     it_assigns :topic
@@ -253,7 +255,7 @@ describe TopicsController, "PUT #update" do
     act! { put :update, :forum_id => 1, :id => 1, :topic => @attributes, :format => 'xml' }
 
     before do
-      @topic.stub!(:save).and_return(false)
+      @topic.stub!(:errors).and_return([@topic])
     end
     
     it_assigns :topic

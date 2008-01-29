@@ -156,7 +156,6 @@ describe Topic, "#editable_by?" do
   end
 
   it "restricts user for other topic" do
-    @user.should_receive(:admin?).and_return(false)
     @user.should_receive(:moderator_of?).and_return(false)
     @topic.should_not be_editable_by(@user)
   end
@@ -166,20 +165,7 @@ describe Topic, "#editable_by?" do
     @topic.should be_editable_by(@user)
   end
   
-  it "allows admin" do
-    @user.should_receive(:admin?).and_return(true)
-    @topic.should be_editable_by(@user)
-  end
-  
-  it "restricts moderator for other forum" do
-    @user.should_receive(:admin?).and_return(false)
-    @user.should_receive(:moderator_of?).with(1).and_return(false)
-    @topic.forum_id = 1
-    @topic.should_not be_editable_by(@user)
-  end
-  
   it "allows moderator" do
-    @user.should_receive(:admin?).and_return(false)
     @user.should_receive(:moderator_of?).with(2).and_return(true)
     @topic.forum_id = 2
     @topic.should be_editable_by(@user)

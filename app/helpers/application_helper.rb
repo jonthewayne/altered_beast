@@ -65,4 +65,8 @@ module ApplicationHelper
   def jstime(time, format = nil)
     content_tag 'span', time.strftime(format || @@default_jstime_format), :class => 'time'
   end
+
+  def for_moderators_of(record, &block)
+    moderator_of?(record) && concat(capture(&block), block.binding)
+  end
 end

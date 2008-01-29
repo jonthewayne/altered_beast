@@ -26,6 +26,13 @@ module AuthenticatedSystem
       logged_in? && current_user.admin?
     end
     
+    def moderator_of?(record)
+      return true  if admin?
+      return false unless logged_in?
+      forum = record.respond_to?(:forum) ? record.forum : record
+      current_user.moderator_of? forum
+    end
+    
     # Check if the user is authorized
     #
     # Override this method in your controllers if you want to restrict access
@@ -104,7 +111,7 @@ module AuthenticatedSystem
     # Inclusion hook to make #current_user and #logged_in?
     # available as ActionView helper methods.
     def self.included(base)
-      base.send :helper_method, :current_user, :logged_in?, :current_site, :admin?
+      base.send :helper_method, :current_user, :logged_in?, :current_site, :admin?, :moderator_of?
     end
 
     # Called from #current_user.  First attempt to login by the user id stored in the session.

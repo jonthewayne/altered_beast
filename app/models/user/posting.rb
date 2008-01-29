@@ -6,13 +6,10 @@ class User
   #
   def post(forum, attributes)
     attributes.symbolize_keys!
-    returning Topic.new(attributes) do |topic|
-      if admin? || moderator_of?(forum)
-        topic.sticky, topic.locked = attributes[:sticky], attributes[:locked]
-      end
+    Topic.new(attributes) do |topic|
       topic.forum = forum
       topic.user  = self
-      topic.save
+      revise_topic topic, attributes
     end
   end
 
@@ -23,5 +20,20 @@ class User
       post.user  = self
       post.save
     end
+  end
+  
+  def revise(record, attributes)
+    case record
+      when Topic then revise_topic(record, attributes)
+      when Post  then post.save
+      else raise "Invalid record to revise: #{record.class.name.inspect}"
+    end
+    record
+  end
+
+protected
+  def revise_topic(topic, attributes)
+    topic.sticky, topic.locked = attributes[:sticky], attributes[:locked] if moderator_of?(topic.forum)
+    topic.save
   end
 end

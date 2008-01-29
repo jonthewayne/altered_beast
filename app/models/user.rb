@@ -31,7 +31,7 @@ class User < ActiveRecord::Base
   end
 
   def moderator_of?(forum)
-    Moderatorship.exists?(:user_id => id, :forum_id => forum.id)
+    admin? || Moderatorship.exists?(:user_id => id, :forum_id => forum.id)
   end
 
   def display_name
