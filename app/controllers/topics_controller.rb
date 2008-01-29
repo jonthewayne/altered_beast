@@ -41,7 +41,7 @@ class TopicsController < ApplicationController
   end
 
   def create
-    @topic = @forum.topics.post!(params[:topic], current_user)
+    @topic = current_user.post @forum, params[:topic]
 
     respond_to do |format|
       if @topic.new_record?

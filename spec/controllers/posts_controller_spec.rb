@@ -172,9 +172,10 @@ end
 describe PostsController, "POST #create" do
   include PostsControllerParentObjects
   before do
+    login_as :default
     @attributes = {:body => 'foo'}
     @post = mock_model Post, :new_record? => false, :errors => []
-    @topic.stub!(:post!).with('foo', :false).and_return(@post)
+    @user.stub!(:reply).with(@topic, @attributes[:body]).and_return(@post)
   end
   
   describe PostsController, "(successful creation)" do

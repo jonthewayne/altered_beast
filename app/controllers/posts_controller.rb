@@ -38,7 +38,7 @@ class PostsController < ApplicationController
   end
 
   def create
-    @post = @topic.post! params[:post][:body], current_user
+    @post = current_user.reply @topic, params[:post][:body]
 
     respond_to do |format|
       if @post.new_record?

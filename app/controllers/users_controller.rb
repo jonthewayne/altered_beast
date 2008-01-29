@@ -14,13 +14,14 @@ class UsersController < ApplicationController
   def create
     cookies.delete :auth_token
     @user = current_site.users.build(params[:user])
-    raise ActiveRecord::RecordInvalid.new(@user) unless @user.valid?
-    @user.register!
-    self.current_user = @user
-    redirect_back_or_default('/')
-    flash[:notice] = "Thanks for signing up!"
-  rescue ActiveRecord::RecordInvalid
-    render :action => 'new'
+    @user.register! if @user.valid?
+    unless @user.new_record?
+      self.current_user = @user
+      redirect_back_or_default('/')
+      flash[:notice] = "Thanks for signing up!"
+    else
+      render :action => 'new'
+    end
   end
 
   def edit

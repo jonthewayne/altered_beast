@@ -37,31 +37,6 @@ class Topic < ActiveRecord::Base
   
   has_permalink :title
 
-  # Creates new topic and post.
-  # Only..
-  #  - sets sticky/locked bits if you're a moderator or admin 
-  #  - changes forum_id if you're an admin
-  #
-  def self.post!(attributes, user)
-    attributes.symbolize_keys!
-    returning Topic.new(attributes) do |topic|
-      if user.admin? || user.moderator_of?(topic.forum)
-        topic.sticky, topic.locked = attributes[:sticky], attributes[:locked]
-      end
-      topic.user = user
-      topic.save
-    end
-  end
-  
-  def post!(body, user)
-    returning posts.build(:body => body) do |post|
-      post.site  = site
-      post.forum = forum
-      post.user  = user
-      post.save
-    end
-  end
-
   def sticky?
     sticky == 1
   end
@@ -94,7 +69,7 @@ class Topic < ActiveRecord::Base
 
 protected
   def create_initial_post
-    post! @body, user unless locked?
+    user.reply self, @body unless locked?
     @body = nil
   end
   

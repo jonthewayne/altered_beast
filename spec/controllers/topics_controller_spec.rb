@@ -144,12 +144,12 @@ end
 
 describe TopicsController, "POST #create" do
   before do
+    login_as :default
     @forum  = forums(:default)
     Forum.stub!(:find_by_permalink).with('1').and_return(@forum)
-    @forum.stub!(:topics).and_return([])
     @attributes = {}
     @topic = mock_model Topic, :new_record? => false, :errors => []
-    @forum.topics.stub!(:post!).with(@attributes, :false).and_return(@topic)
+    @user.stub!(:post).with(@forum, @attributes).and_return(@topic)
   end
   
   describe TopicsController, "(successful creation)" do
