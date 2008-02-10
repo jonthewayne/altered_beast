@@ -1,77 +1,80 @@
-// http://redhanded.hobix.com/inspect/showingPerfectTime.html
-/* other support functions -- thanks, ecmanaut! */
-var strftime_funks = {
-  zeropad: function( n ){ return n > 9 ? n : '0' + n; },
-  a: function(t) { return ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'][t.getDay()] },
-  A: function(t) { return ['Sunday','Monday','Tuedsay','Wednesday','Thursday','Friday','Saturday'][t.getDay()] },
-  b: function(t) { return ['Jan','Feb','Mar','Apr','May','Jun', 'Jul','Aug','Sep','Oct','Nov','Dec'][t.getMonth()] },
-  B: function(t) { return ['January','February','March','April','May','June', 'July','August',
-      'September','October','November','December'][t.getMonth()] },
-  c: function(t) { return t.toString() },
-  d: function(t) { return this.zeropad(t.getDate()) },
-  H: function(t) { return this.zeropad(t.getHours()) },
-  I: function(t) { return this.zeropad((t.getHours() + 12) % 12) },
-  m: function(t) { return this.zeropad(t.getMonth()+1) }, // month-1
-  M: function(t) { return this.zeropad(t.getMinutes()) },
-  p: function(t) { return this.H(t) < 12 ? 'AM' : 'PM'; },
-  S: function(t) { return this.zeropad(t.getSeconds()) },
-  w: function(t) { return t.getDay() }, // 0..6 == sun..sat
-  y: function(t) { return this.zeropad(this.Y(t) % 100); },
-  Y: function(t) { return t.getFullYear() },
-  '%': function(t) { return '%' }
-};
-
-Date.prototype.strftime = function (fmt) {
-    var t = this;
-    for (var s in strftime_funks) {
-        if (s.length == 1 )
-            fmt = fmt.replace('%' + s, strftime_funks[s](t));
-    }
-    return fmt;
-};
-
-// http://twitter.pbwiki.com/RelativeTimeScripts
-Date.distanceOfTimeInWords = function(fromTime, toTime, includeTime) {
-  var delta = parseInt((toTime.getTime() - fromTime.getTime()) / 1000);
-  if(delta < 60) {
-      return 'less than a minute ago';
-  } else if(delta < 120) {
-      return 'about a minute ago';
-  } else if(delta < (45*60)) {
-      return (parseInt(delta / 60)).toString() + ' minutes ago';
-  } else if(delta < (120*60)) {
-      return 'about an hour ago';
-  } else if(delta < (24*60*60)) {
-      return 'about ' + (parseInt(delta / 3600)).toString() + ' hours ago';
-  } else if(delta < (48*60*60)) {
-      return '1 day ago';
-  } else {
-    var days = (parseInt(delta / 86400)).toString();
-    if(days > 5) {
-      var fmt  = '%B %d'
-      if(toTime.getYear() != fromTime.getYear()) { fmt += ', %Y' }
-      if(includeTime) fmt += ' %I:%M %p'
-      return fromTime.strftime(fmt);
-    } else {
-      return days + " days ago"
-    }
+var TopicForm = {
+  editNewTitle: function(txtField) {
+    $('new_topic').innerHTML = (txtField.value.length > 5) ? txtField.value : 'New Topic';
   }
 }
 
-Date.prototype.timeAgoInWords = function() {
-  var relative_to = (arguments.length > 0) ? arguments[1] : new Date();
-  return Date.distanceOfTimeInWords(this, relative_to, arguments[2]);
+var LoginForm = {
+  setToPassword: function() {
+    $('openid_fields').hide();
+    $('password_fields').show();
+  },
+  
+  setToOpenID: function() {
+    $('password_fields').hide();
+    $('openid_fields').show();
+  }
 }
 
-// for those times when you get a UTC string like 18 May 09:22 AM
-Date.parseUTC = function(value) {
-  var localDate = new Date(value);
-  var utcSeconds = Date.UTC(localDate.getFullYear(), localDate.getMonth(), localDate.getDate(), localDate.getHours(), localDate.getMinutes(), localDate.getSeconds())
-  return new Date(utcSeconds);
+var EditForm = {
+  // show the form
+  init: function(postId) {
+    $('edit-post-' + postId + '_spinner').show();
+    this.clearReplyId();
+  },
+
+  // sets the current post id we're editing
+  setReplyId: function(postId) {
+    $('edit').setAttribute('post_id', postId.toString());
+    $('post_' + postId + '-row').addClassName('editing');
+    if($('reply')) $('reply').hide();
+  },
+  
+  // clears the current post id
+  clearReplyId: function() {
+    var currentId = this.currentReplyId()
+    if(!currentId || currentId == '') return;
+
+    var row = $('post_' + currentId + '-row');
+    if(row) row.removeClassName('editing');
+    $('edit').setAttribute('post_id', '');
+  },
+  
+  // gets the current post id we're editing
+  currentReplyId: function() {
+    return $('edit').getAttribute('post_id');
+  },
+  
+  // checks whether we're editing this post already
+  isEditing: function(postId) {
+    if (this.currentReplyId() == postId.toString())
+    {
+      $('edit').show();
+      $('edit_post_body').focus();
+      return true;
+    }
+    return false;
+  },
+
+  // close reply, clear current reply id
+  cancel: function() {
+    this.clearReplyId();
+    $('edit').hide()
+  }
+}
+
+var ReplyForm = {
+  // yes, i use setTimeout for a reason
+  init: function() {
+    EditForm.cancel();
+    $('reply').toggle();
+    $('post_body').focus();
+    // for Safari which is sometime weird
+//    setTimeout('$(\"post_body\").focus();',50);
+  }
 }
 
 document.observe('dom:loaded', function() {
-   $$('span.time').each(function(span) {
-     span.update(Date.parseUTC(span.innerHTML).timeAgoInWords());
-   });
-});
+  $('search').hide();
+//  $('monitor_submit').hide()
+})

@@ -75,7 +75,8 @@ end
 describe Post, "#editable_by?" do
   before do
     @user  = mock_model User
-    @post  = Post.new
+    @post  = Post.new :forum => @forum
+    @forum = mock_model Forum, :user_id => @user.id
   end
 
   it "restricts user for other post" do
@@ -94,14 +95,14 @@ describe Post, "#editable_by?" do
   end
   
   it "restricts moderator for other forum" do
-    @user.should_receive(:moderator_of?).with(1).and_return(false)
-    @post.forum_id = 1
+    @post.should_receive(:forum).and_return @forum
+    @user.should_receive(:moderator_of?).with(@forum).and_return(false)
     @post.should_not be_editable_by(@user)
   end
   
   it "allows moderator" do
-    @user.should_receive(:moderator_of?).with(2).and_return(true)
-    @post.forum_id = 2
-    @post.should     be_editable_by(@user)
+    @post.should_receive(:forum).and_return @forum
+    @user.should_receive(:moderator_of?).with(@forum).and_return(true)
+    @post.should be_editable_by(@user)
   end
 end

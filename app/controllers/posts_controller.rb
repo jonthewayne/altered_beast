@@ -35,6 +35,10 @@ class PostsController < ApplicationController
   end
 
   def edit
+    respond_to do |format|
+      format.html # edit.html.erb
+      format.js
+    end
   end
 
   def create

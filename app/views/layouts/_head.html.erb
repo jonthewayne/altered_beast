@@ -5,7 +5,7 @@
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
   <title><%= "#{h @page_title} - " if @page_title %><%= 'Beast'[:beast_title] %></title>
   <%= stylesheet_link_tag 'display' %>
-  <%= javascript_include_tag "prototype", "effects", "application", :cache => 'beast' %>
+  <%= javascript_include_tag "prototype", "effects", "application", "time", :cache => 'beast' %>
 <% unless @feed_icons.blank? -%>
   <% @feed_icons.each do |feed| -%>
   <%= auto_discovery_link_tag :atom, feed[:url], :title => "Subscribe to '#{feed[:title]}'" %>
@@ -35,5 +35,5 @@
     <li><%= link_to 'Login'[:login_action], login_path(:to => CGI.escape(request.request_uri)) %></li>
     <% end -%>
   </ul>
-  <h1><%= link_to 'Beast'[:beast_title], root_path %></h1>
+  <h1><%= link_to 'Altered Beast'[:beast_title], root_path %></h1>
 </div>

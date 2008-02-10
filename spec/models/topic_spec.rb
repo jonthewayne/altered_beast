@@ -152,7 +152,8 @@ end
 describe Topic, "#editable_by?" do
   before do
     @user  = mock_model User
-    @topic = Topic.new
+    @topic = Topic.new :forum => @forum
+    @forum = mock_model(Forum)
   end
 
   it "restricts user for other topic" do
@@ -166,8 +167,9 @@ describe Topic, "#editable_by?" do
   end
   
   it "allows moderator" do
-    @user.should_receive(:moderator_of?).with(2).and_return(true)
-    @topic.forum_id = 2
+    @topic.should_receive(:forum).and_return(@forum)
+    @user.should_receive(:moderator_of?).with(@forum).and_return(true)
+    # @topic.forum_id = 2
     @topic.should be_editable_by(@user)
   end
 end
