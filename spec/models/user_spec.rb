@@ -154,15 +154,32 @@ describe User, "with no created users" do
   define_models :copy => false do
     model User
   end
+
+  def make_user(site, login, email)
+    user = User.new :login => login, :email => email, :password => 'quire', :password_confirmation => 'quire'
+    user.site_id = site.id
+    # user.stub!(:site).and_return @site
+    user.save!
+    user
+  end
   
   it 'creates initial user as an admin' do
-    user = User.new :login => 'quire', :email => 'quire@example.com', :password => 'quire', :password_confirmation => 'quire'
-    user.site_id = 1
-    user.save!
+    site = Site.create! :name => "xfoo", :host => "xsite1.com"
+    user = make_user(site, 'quire', 'quire@example.com')
     user.should be_admin
   end
   
   it 'creates initial user as admin for each site' do
-    pending "unique per site"
+    site = Site.create! :name => "foo", :host => "site1.com"
+
+    user1 = make_user(site, 'quire1', 'quire@example1.com')
+    user1.should be_admin
+
+    user2 = make_user(site, 'quire2', 'quire@example2.com')
+    user2.should_not be_admin
+
+    site2 = Site.create! :name => "bar", :host => "site2.com"
+    user3 = make_user(site2, 'quire3', 'quire@example3.com')
+    user3.should be_admin
   end
 end
