@@ -88,6 +88,7 @@ describe UsersController, "PUT #update" do
     @attributes = {'login' => "Default"}
     @controller.stub!(:current_site).and_return(@site)
     @controller.stub!(:login_required).and_return(true)
+    @controller.stub!(:find_user)
   end
   
   describe UsersController, "(successful save)" do
