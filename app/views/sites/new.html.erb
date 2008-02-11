@@ -5,7 +5,7 @@
 <h1><%= 'New Site'[:new_site] %></h1>
 
 <% form_for :site, :url => sites_path do |f| -%>
-<p><%= 'Welcome to your shiny new Altered Beast forum.  Please name your first site!'[:welcome_new_site] %></p>
+<p><%= 'Welcome to your shiny new Altered Beast forum.  Please name your site!'[:welcome_new_site] %></p>
 <%= render :partial => "form", :object => f %>
 <%= submit_tag 'Create'[:Create], :or => link_to('Cancel'[:cancel], sites_path) %>
 <% end -%>
