@@ -15,7 +15,7 @@ class User
   end
   
   event :suspend do
-    transitions :from => [:passive, :pending, :active], :to => :suspended
+    transitions :from => [:passive, :pending, :active], :to => :suspended, :guard => :remove_moderatorships
   end
   
   event :delete do
@@ -47,5 +47,9 @@ protected
   def do_activate
     self.activated_at = Time.now.utc
     self.deleted_at = self.activation_code = nil
+  end
+  
+  def remove_moderatorships
+    moderatorships.delete_all
   end
 end

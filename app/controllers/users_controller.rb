@@ -1,7 +1,7 @@
 class UsersController < ApplicationController
-  before_filter :admin_required, :only => [:suspend, :unsuspend, :destroy, :purge]
-  before_filter :find_user, :only => [:update, :show, :suspend, :unsuspend, :destroy, :purge]
-  before_filter :login_required, :only => [:edit, :update]
+  before_filter :admin_required, :only => [:suspend, :unsuspend, :destroy, :purge, :edit]
+  before_filter :find_user, :only => [:update, :show, :edit, :suspend, :unsuspend, :destroy, :purge]
+  before_filter :login_required, :only => [:settings, :update]
   
   def index
     @users = current_site.users.paginate :all, :page => current_page
@@ -24,18 +24,20 @@ class UsersController < ApplicationController
     end
   end
 
-  def edit
-    if params[:id]
-      redirect_to settings_path and return
-    end
+  def settings
     @user = current_user
+    render :action => "edit"
+  end
+  
+  def edit
+    @user = find_user
   end
 
   def update
-    @user = current_user
+    @user = admin? ? find_user : current_user
     respond_to do |format|
       if @user.update_attributes(params[:user])
-        flash[:notice] = 'Forum was successfully updated.'
+        flash[:notice] = 'User account was successfully updated.'
         format.html { redirect_to(settings_path) }
         format.xml  { head :ok }
       else
@@ -56,11 +58,13 @@ class UsersController < ApplicationController
 
   def suspend
     @user.suspend! 
+    flash[:notice] = "User was suspended."
     redirect_to users_path
   end
 
   def unsuspend
     @user.unsuspend! 
+    flash[:notice] = "User was unsuspended."
     redirect_to users_path
   end
 
@@ -76,10 +80,14 @@ class UsersController < ApplicationController
 
 protected
   def find_user
-    @user = current_site.users.find_by_permalink(params[:id])
+    @user = if admin?
+      current_site.all_users.find_by_permalink(params[:id])
+    else
+      current_site.users.find_by_permalink(params[:id])
+    end or raise ActiveRecord::RecordNotFound
   end
   
   def authorized?
-    params[:id].blank? || @user == current_user
+    admin? || params[:id].blank? || @user == current_user
   end
 end

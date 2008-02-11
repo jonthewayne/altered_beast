@@ -88,12 +88,14 @@
 
     <%= avatar_for post.user %>
     <span class="fn"><%= link_to truncate(h(post.user.display_name), 15), user_path(post.user), :class => (post.user == @posts.first.user ? "threadauthor" : nil) %></span>
-    <% if post.user.admin? || post.forum.moderators.include?(post.user) %>
+    <% if post.user.admin? || post.forum.moderators.include?(post.user) || !post.user.active? %>
     <span class="admin">
       <% if post.user.admin? %>
       <%= 'Administator'[:administrator_title] %>
       <% elsif post.forum.moderators.include?(post.user) %>
       <%= 'Moderator'[:moderator_title] %>
+      <% elsif post.user.suspended? %>
+      <%=h post.user.state  %>
       <% end %>
     </span>
     <% end %>
@@ -118,7 +120,11 @@
 <!--
     <%= link_to_function image_tag('clearbits/comment.gif', :class => 'icon reply'), "$('reply').toggle()" if logged_in? %>
 -->
-    <%= post.body_html %>
+      <% if post.user.active? %>
+        <%= post.body_html %>
+      <% else %>
+        <p><% "(This post has been removed)"[:suspended_user_post] %></p>
+      <% end %>
   </td>
 </tr>
 
