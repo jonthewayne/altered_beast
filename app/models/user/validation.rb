@@ -46,7 +46,7 @@ protected
   end
   
   def set_first_user_as_admin
-    self.admin = true if User.count.zero?
+    self.admin = true if site and site.users.size.zero?
   end
   
   def downcase_email_and_login
