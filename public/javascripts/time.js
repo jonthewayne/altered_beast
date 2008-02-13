@@ -70,8 +70,17 @@ Date.parseUTC = function(value) {
   return new Date(utcSeconds);
 }
 
-document.observe('dom:loaded', function() {
-   $$('span.time').each(function(span) {
-     span.update(Date.parseUTC(span.innerHTML).timeAgoInWords());
-   });
+var TimeFormatter = Behavior.create({
+	initialize: function(timeFormat) {
+		this.timeFormat = timeFormat
+		this.element.update(this.formatTime(Date.parseUTC(this.element.innerHTML)))
+	},
+	
+	formatTime: function(time) {
+		return time.strftime(this.timeFormat)
+	}
 });
+
+var RelativeTime = Behavior.create(TimeFormatter, {
+	formatTime: function(time) { return time.timeAgoInWords() }
+})

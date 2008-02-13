@@ -1,3 +1,5 @@
+var Beast = {}
+
 var TopicForm = {
   editNewTitle: function(txtField) {
     $('new_topic').innerHTML = (txtField.value.length > 5) ? txtField.value : 'New Topic';
@@ -74,7 +76,22 @@ var ReplyForm = {
   }
 }
 
-document.observe('dom:loaded', function() {
-  $('search').hide();
-//  $('monitor_submit').hide()
+Ghost = Behavior.create({
+	initialize: function() { this.element.hide() }
+})
+
+SearchLink = Behavior.create({
+	onclick: function() {
+		$('search').toggle();
+		$('search_box').focus();
+	}
+})
+
+Event.addBehavior({
+	'#search':      Ghost,
+	'#search-link': SearchLink,
+	'span.time':    RelativeTime
+})
+
+document.observe("dom:loaded", function() {
 })

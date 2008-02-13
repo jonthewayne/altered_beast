@@ -68,8 +68,8 @@
 <a name="<%= dom_id @posts.first %>" id="<%= dom_id @posts.first %>">&nbsp;</a>
 
 <table border="0" cellspacing="0" cellpadding="0" class="posts wide">
-<% for post in @posts do %>
-<% unless post == @posts.first %>
+<% for post in @posts do -%>
+<% unless post == @posts.first -%>
 <tr class="spacer">
   <td colspan="2">
     <a name="<%= dom_id post %>" id="<%= dom_id post %>">&nbsp;</a>
@@ -136,13 +136,13 @@
 
 <% if logged_in? %>
 <div id="edit"></div>
-<% if @topic.locked? %>
+<% if @topic.locked? -%>
 <p>
     <%= image_tag "clearbits/lock.gif", :class => "icon grey", :title => "Topic locked"[:topic_locked_title] %> 
     <label>
     <%= 'This topic is locked'[:locked_topic] %>.</label>
 </p>
-<% else %>
+<% else -%>
 
 <p><%= link_to_function 'Reply to topic'[], "ReplyForm.init()", :class => "utility" %></p>
 
