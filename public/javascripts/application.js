@@ -1,5 +1,3 @@
-var Beast = {}
-
 var TopicForm = {
   editNewTitle: function(txtField) {
     $('new_topic').innerHTML = (txtField.value.length > 5) ? txtField.value : 'New Topic';
@@ -18,38 +16,52 @@ var LoginForm = {
   }
 }
 
-var EditForm = {
-  // show the form
-  init: function(postId) {
-    $('edit-post-' + postId + '_spinner').show();
-    this.clearReplyId();
-  },
+var PostForm = {
+	postId: null,
+
+	reply: Behavior.create({
+		onclick:function() {
+    	PostForm.cancel();
+    	$('reply').toggle();
+    	$('post_body').focus();
+		}
+	}),
+
+	edit: Behavior.create(Remote.Link, {
+		initialize: function($super, postId) {
+			this.postId = postId;
+			return $super();
+		},
+		onclick: function($super) {
+			$('edit-post-' + this.postId + '_spinner').show();
+			PostForm.clearPostId();
+			return $super();
+		}
+	}),
+	
+	cancel: Behavior.create({
+		onclick: function() { 
+			PostForm.clearPostId(); 
+			$('edit').hide()
+			$('reply').hide()
+			return false;
+		}
+	}),
 
   // sets the current post id we're editing
-  setReplyId: function(postId) {
-    $('edit').setAttribute('post_id', postId.toString());
+  editPost: function(postId) {
+		this.postId = postId;
     $('post_' + postId + '-row').addClassName('editing');
+		$('edit-post-' + postId + '_spinner').hide()
     if($('reply')) $('reply').hide();
+		this.cancel.attach($('edit-cancel'))
+		$('edit-form').observe('submit', function() { $('editbox_spinner').show() })
+		setTimeout("$('edit_post_body').focus()", 250)
   },
-  
-  // clears the current post id
-  clearReplyId: function() {
-    var currentId = this.currentReplyId()
-    if(!currentId || currentId == '') return;
 
-    var row = $('post_' + currentId + '-row');
-    if(row) row.removeClassName('editing');
-    $('edit').setAttribute('post_id', '');
-  },
-  
-  // gets the current post id we're editing
-  currentReplyId: function() {
-    return $('edit').getAttribute('post_id');
-  },
-  
   // checks whether we're editing this post already
   isEditing: function(postId) {
-    if (this.currentReplyId() == postId.toString())
+    if (PostForm.postId == postId.toString())
     {
       $('edit').show();
       $('edit_post_body').focus();
@@ -58,40 +70,35 @@ var EditForm = {
     return false;
   },
 
-  // close reply, clear current reply id
-  cancel: function() {
-    this.clearReplyId();
-    $('edit').hide()
+  clearPostId: function() {
+    var currentId = PostForm.postId;
+    if(!currentId) return;
+
+    var row = $('post_' + currentId + '-row');
+    if(row) row.removeClassName('editing');
+		PostForm.postId = null;
   }
 }
-
-var ReplyForm = {
-  // yes, i use setTimeout for a reason
-  init: function() {
-    EditForm.cancel();
-    $('reply').toggle();
-    $('post_body').focus();
-    // for Safari which is sometime weird
-//    setTimeout('$(\"post_body\").focus();',50);
-  }
-}
-
-Ghost = Behavior.create({
-	initialize: function() { this.element.hide() }
-})
-
-SearchLink = Behavior.create({
-	onclick: function() {
-		$('search').toggle();
-		$('search_box').focus();
-	}
-})
 
 Event.addBehavior({
-	'#search':      Ghost,
-	'#search-link': SearchLink,
-	'span.time':    RelativeTime
-})
-
-document.observe("dom:loaded", function() {
+	'span.time': toTimeAgoInWords,
+	'#search, #reply': function() { this.hide() },
+	'#search-link:click': function() {
+		$('search').toggle();
+		$('search_box').focus();
+		return false
+	},
+	
+	'tr.post': function() {
+		var postId = this.id.match(/^post_(\d+)-/)[1]
+		PostForm.edit.attach(this.down('.edit a'), postId);
+	},
+	
+	'#reply-link': function() {
+		PostForm.reply.attach(this)
+	},
+	
+	'#reply-cancel': function() {
+		PostForm.cancel.attach(this)
+	}
 })

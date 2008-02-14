@@ -187,7 +187,7 @@ describe PostsController, "POST #create" do
     end
     
     it_assigns :post, :forum, :topic, :parent => lambda { @topic }, :flash => { :notice => :not_nil }
-    it_redirects_to { forum_topic_post_path(@forum, @topic, @post) }
+    it_redirects_to { forum_topic_post_path(@forum, @topic, @post, :anchor => "post_#{@post.id}") }
   end
 
   describe PostsController, "(unsuccessful creation)" do
@@ -245,7 +245,7 @@ describe PostsController, "PUT #update" do
     end
     
     it_assigns :post, :forum, :topic, :parent => lambda { @topic }, :flash => { :notice => :not_nil }
-    it_redirects_to { forum_topic_path(@forum, @topic) }
+    it_redirects_to { forum_topic_path(@forum, @topic, :anchor => "post_#{@post.id}") }
   end
 
   describe PostsController, "(unsuccessful save)" do

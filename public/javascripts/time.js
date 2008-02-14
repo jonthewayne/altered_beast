@@ -70,17 +70,6 @@ Date.parseUTC = function(value) {
   return new Date(utcSeconds);
 }
 
-var TimeFormatter = Behavior.create({
-	initialize: function(timeFormat) {
-		this.timeFormat = timeFormat
-		this.element.update(this.formatTime(Date.parseUTC(this.element.innerHTML)))
-	},
-	
-	formatTime: function(time) {
-		return time.strftime(this.timeFormat)
-	}
-});
-
-var RelativeTime = Behavior.create(TimeFormatter, {
-	formatTime: function(time) { return time.timeAgoInWords() }
-})
+function toTimeAgoInWords() {
+	this.update(Date.parseUTC(this.innerHTML).timeAgoInWords())
+}

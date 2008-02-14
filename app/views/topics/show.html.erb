@@ -106,10 +106,7 @@
     <p>
       <span class="edit">
         <%= ajax_spinner_for "edit-post-#{post.id}", "spinner_bounce.gif" %>
-        <%= link_to_remote('Edit post'[], 
-              {:url => edit_forum_topic_post_path(@forum, @topic, post), :method => :get,
-               :before => "EditForm.init(#{post.id});", :condition => "!EditForm.isEditing(#{post.id})" }, 
-              {:href => edit_forum_topic_post_path(@forum, @topic, post, :page => current_page), :class => "utility"}) %>
+				<%= link_to 'Edit post'[], edit_forum_topic_post_path(@forum, @topic, post, :page => current_page), :class => 'utility' %>
       </span>
     </p>
     <% end -%>
@@ -144,7 +141,7 @@
 </p>
 <% else -%>
 
-<p><%= link_to_function 'Reply to topic'[], "ReplyForm.init()", :class => "utility" %></p>
+<p><%= link_to 'Reply to topic'[], "#reply", :class => "utility", :id => 'reply-link' %></p>
 
 <div id="reply" class="editbox">
 <div class="container">
@@ -174,14 +171,13 @@
     </tr>
     <tr>
       <td valign="bottom" style="padding-bottom:15px;">
-       <%= submit_tag "Save Reply"[] %><span class="button_or">or <%= link_to_function 'cancel'[], "$('reply').hide()" %></span>
+       <%= submit_tag "Save Reply"[] %><span class="button_or">or <%= link_to 'cancel'[], '#', :id => 'reply-cancel' %></span>
      </td>
    </tr>
   </table>
   <% end -%>
 </div>
 </div>
-<%= javascript_tag "$('reply').hide();"%>
 <% end %>
 <% end %>
 
